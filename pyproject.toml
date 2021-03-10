@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "connect-reports-core"
+version = "0.1.0"
+description = "Connect Reports Core"
+authors = ["CloudBlue LLC"]
+license = "Apache 2"
+packages = [
+    { include = "connect" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+openpyxl = ">=2.5.14"
+WeasyPrint = "^52.2"
+Jinja2 = "^2.11.3"
+jsonschema = "^3.2.0"
+pytz = "^2021.1"
+lxml = "^4.6.2"
+
+[tool.poetry.dev-dependencies]
+ipython = "^7.21.0"
+pytest = "^6.1.2"
+pytest-cov = "^2.10.1"
+pytest-mock = "^3.3.1"
+coverage = {extras = ["toml"], version = "^5.3"}
+flake8 = "~3.8"
+flake8-bugbear = "~20"
+flake8-cognitive-complexity = "^0.1"
+flake8-commas = "~2.0"
+flake8-future-import = "~0.4"
+flake8-import-order = "~0.18"
+flake8-broken-line = "~0.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "setuptools"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+log_cli = true
+addopts = "--cov=connect.reports --cov-report=term-missing:skip-covered --cov-report=html --cov-report=xml"
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+omit = [
+    "*/migrations/*",
+    "*/config/*",
+    "*/settings/*",
+    "*/manage.py",
+    "*/wsgi.py",
+    "*/urls.py"
+]
+
+exclude_lines = [
+    "pragma: no cover",
+    "def __str__",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

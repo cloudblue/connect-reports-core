@@ -1,0 +1,218 @@
+{
+    "type": "object",
+    "required": [ "name", "readme_file", "version", "language", "reports" ],
+    "properties": {
+        "name": {
+            "description": "The name of the reports repository.",
+            "type": "string"
+        },
+        "readme_file": {
+            "description": "The README.md file where describe the repository functionality.",
+            "type": "string"
+        },
+        "version": {
+            "description": "The version of the repository.",
+            "type": "string"
+        },
+        "language": {
+            "description": "The main language used for reports generation.",
+            "type": "string",
+            "enum": ["python"]
+        },
+        "reports": {
+            "description": "List of reports.",
+            "type": "array",
+            "items": { 
+                "oneOf": [
+                    { "$ref": "#/definitions/report_v1" },
+                    { "$ref": "#/definitions/report_v2" }
+                ]
+            },
+            "minItems": 1
+        }
+    },
+    "definitions": {
+        "report_v1": {
+            "type": "object",
+            "required": [ "name", "readme_file", "template", "start_row", "start_col", "entrypoint", "audience", "report_spec" ],
+            "properties": {
+                "name": {
+                    "description": "Report name.",
+                    "type": "string"
+                },
+                "readme_file": {
+                    "description": "Report description file.",
+                    "type": "string"
+                },
+                "template": {
+                    "description": "Report MS excel template.",
+                    "type": "string"
+                },
+                "start_row": {
+                    "description": "Excel Row to start reading the report.",
+                    "type": "number",
+                    "minimum": 1
+                },
+                "start_col": {
+                    "description": "Excel Column to start reading the report.",
+                    "type": "number",
+                    "minimum": 1
+                },
+                "entrypoint": {
+                    "description": "Function to call for generating the report.",
+                    "type": "string"
+                },
+                "audience": {
+                    "description": "Report audience",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1
+                },
+                "report_spec": {
+                    "description": "Report specification",
+                    "type": "string",
+                    "enum": ["1"]
+                },
+                "parameters": {
+                    "description": "List of parameters.",
+                    "type": "array",
+                    "items": { 
+                        "$ref": "#/definitions/parameter"
+                    },
+                    "minItems": 0
+                }
+            }
+        },
+        "report_v2": {
+            "type": "object",
+            "required": [ 
+                "name", "readme_file", "entrypoint", "audience", "report_spec", "renderers",
+                "default_renderer"
+            ],
+            "properties": {
+                "name": {
+                    "description": "Report name.",
+                    "type": "string"
+                },
+                "readme_file": {
+                    "description": "Report description file.",
+                    "type": "string"
+                },
+                "entrypoint": {
+                    "description": "Function to call for generating the report.",
+                    "type": "string"
+                },
+                "audience": {
+                    "description": "Report audience",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["provider", "vendor"]
+                    },
+                    "minItems": 1
+                },
+                "report_spec": {
+                    "description": "Report specification",
+                    "type": "string",
+                    "enum": ["2"]
+                },
+                "renderers": {
+                    "description": "List of available renderers.",
+                    "type": "array",
+                    "items": { 
+                        "$ref": "#/definitions/renderer"
+                    },
+                    "minItems": 1
+                },
+                "default_renderer": {
+                    "description": "Default renderer to use.",
+                    "type": "string"
+                },
+                "parameters": {
+                    "description": "List of parameters.",
+                    "type": "array",
+                    "items": { 
+                        "$ref": "#/definitions/parameter"
+                    },
+                    "minItems": 0
+                }
+            }
+        },
+        "renderer": {
+            "type" : "object",
+            "required": [ "id", "type", "description"],
+            "properties": {
+                "id": {
+                    "description": "Renderer unique identifier.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Renderer type.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Renderer description.",
+                    "type": "string"
+                },
+                "template": {
+                    "description": "Renderer template file.",
+                    "type": "string"
+                },
+                "kwargs": {
+                    "description": "Renderer extra keyword arguments.",
+                    "type": "object"
+                }
+            }
+        },
+        "parameter": {
+            "type" : "object",
+            "required": [ "id", "type", "name", "description" ],
+            "properties": {
+                "id": {
+                    "description": "Parameter unique identifier.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Parameter type.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Parameter name.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Parameter description.",
+                    "type": "string"
+                },
+                "required": {
+                    "description": "Boolean to know if parameter is required.",
+                    "type": "boolean"
+                },
+                "choices": {
+                    "description": "Parameter choice list.",
+                    "type": "array",
+                    "items": { 
+                        "$ref": "#/definitions/choice"
+                    },
+                    "minItems": 1
+                }
+            }
+        },
+        "choice": {
+            "type" : "object",
+            "required": [ "value", "label" ],
+            "properties": {
+                "value": {
+                    "description": "Choice value.",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "Choice label.",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
