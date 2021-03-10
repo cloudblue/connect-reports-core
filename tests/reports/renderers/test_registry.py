@@ -1,10 +1,12 @@
 import pytest
 
 from connect.reports.renderers.base import BaseRenderer
-
 from connect.reports.renderers.registry import (
-    RendererAlreadyRegisteredError, RendererNotFoundError,
-    register, get_renderers, get_renderer_class, get_renderer,
+    RendererAlreadyRegisteredError,
+    RendererNotFoundError,
+    get_renderer,
+    get_renderer_class,
+    register,
 )
 
 
