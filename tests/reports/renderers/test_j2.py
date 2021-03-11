@@ -1,6 +1,8 @@
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import Jinja2Renderer
 
+import pytest
+
 
 def test_validate_ok(mocker):
     mocker.patch('connect.reports.renderers.j2.os.path.isfile', return_value=True)
@@ -56,7 +58,14 @@ def test_validate_template_invalid_name(mocker):
     ]
 
 
-def test_render(mocker, account_factory, report_factory, report_data):
+@pytest.mark.parametrize(
+    ('extra_context'),
+    (
+        {'name': 'test', 'desc': 'description'},
+        None,
+    ),
+)
+def test_render(mocker, account_factory, report_factory, report_data, extra_context):
     account = account_factory()
     report = report_factory()
     fsloader = mocker.MagicMock()
@@ -82,10 +91,13 @@ def test_render(mocker, account_factory, report_factory, report_data):
     )
 
     data = report_data()
-
+    renderer.set_extra_context(extra_context)
     ctx = renderer.get_context(data)
 
     assert renderer.render(data, 'report') == 'report.csv'
+    if extra_context:
+        assert 'name' in ctx['extra_context']
+        assert 'desc' in ctx['extra_context']
 
     mocked_loader.assert_called_once_with('root_dir/report_root')
     mocked_environment.assert_called_once_with(loader=fsloader)
