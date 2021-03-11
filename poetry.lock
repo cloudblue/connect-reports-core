@@ -1,4 +1,12 @@
 [[package]]
+name = "appdirs"
+version = "1.4.4"
+description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "appnope"
 version = "0.1.2"
 description = "Disable App Nap on macOS >= 10.9"
@@ -234,6 +242,22 @@ python-versions = "*"
 
 [package.dependencies]
 pycodestyle = "*"
+
+[[package]]
+name = "fs"
+version = "2.4.12"
+description = "Python's filesystem abstraction layer"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+appdirs = ">=1.4.3,<1.5.0"
+pytz = "*"
+six = ">=1.10,<2.0"
+
+[package.extras]
+scandir = ["scandir (>=1.5,<2.0)"]
 
 [[package]]
 name = "html5lib"
@@ -684,9 +708,13 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "bfad2bfbd5e1ebe06af0128795ce59275d562fd34ef7a5726da57091df9ec1db"
+content-hash = "5eecdc011d3c96963f3e1f5ddc4c30800c2b80001cc99f3b1b9d6dc43e5e5082"
 
 [metadata.files]
+appdirs = [
+    {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
+    {file = "appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41"},
+]
 appnope = [
     {file = "appnope-0.1.2-py2.py3-none-any.whl", hash = "sha256:93aa393e9d6c54c5cd570ccadd8edad61ea0c4b9ea7a01409020c9aa019eb442"},
     {file = "appnope-0.1.2.tar.gz", hash = "sha256:dd83cd4b5b460958838f6eb3000c660b1f9caf2a5b1de4264e941512f603258a"},
@@ -851,6 +879,10 @@ flake8-future-import = [
 flake8-import-order = [
     {file = "flake8-import-order-0.18.1.tar.gz", hash = "sha256:a28dc39545ea4606c1ac3c24e9d05c849c6e5444a50fb7e9cdd430fc94de6e92"},
     {file = "flake8_import_order-0.18.1-py2.py3-none-any.whl", hash = "sha256:90a80e46886259b9c396b578d75c749801a41ee969a235e163cfe1be7afd2543"},
+]
+fs = [
+    {file = "fs-2.4.12-py2.py3-none-any.whl", hash = "sha256:da6cc360677712ae27ac4be8a3ef404dd7970dbd1c3eebe87a25bebd94e84b4c"},
+    {file = "fs-2.4.12.tar.gz", hash = "sha256:c10ba188b14d6213a1ca950efd004931abbfa64b294c80bbf1045753831bf42f"},
 ]
 html5lib = [
     {file = "html5lib-1.1-py2.py3-none-any.whl", hash = "sha256:0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d"},
