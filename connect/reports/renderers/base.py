@@ -17,13 +17,20 @@ class BaseRenderer(metaclass=ABCMeta):
         self.report = report
         self.template = template
         self.kwargs = kwargs or {}
+        self.extra_context = None
 
     def get_context(self, data):
-        return {
+        context = {
             'account': self.account,
             'report': self.report,
             'data': data,
         }
+        if self.extra_context:
+            context['extra_context'] = self.extra_context
+        return context
+
+    def set_extra_context(self, data):
+        self.extra_context = data
 
     @abstractmethod
     def render(self, data, output_file):
