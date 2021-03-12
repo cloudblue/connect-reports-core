@@ -51,8 +51,8 @@ class PDFRenderer(Jinja2Renderer):
     @classmethod
     def validate(cls, definition):
         errors = super(PDFRenderer, cls).validate(definition)
-        if definition.kwargs is not None:
-            css_file = definition.kwargs.get('css_file')
+        if definition.args is not None:
+            css_file = definition.args.get('css_file')
             if css_file and not os.path.isfile(
                 os.path.join(definition.root_path, css_file),
             ):

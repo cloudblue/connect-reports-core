@@ -28,7 +28,7 @@ def parse(root_path, data):
                     type='xlsx',
                     description='Render report to Excel.',
                     template=template,
-                    kwargs={
+                    args={
                         'start_row': start_row,
                         'start_col': start_col,
                     }),

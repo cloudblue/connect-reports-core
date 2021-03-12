@@ -24,7 +24,7 @@ class RendererDefinition:
     type: str
     description: str
     template: str = field(default=None)
-    kwargs: Dict[str, Any] = field(default=None)
+    args: Dict[str, Any] = field(default=None)
 
 
 @dataclass

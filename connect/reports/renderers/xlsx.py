@@ -7,6 +7,9 @@ import pytz
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.styles.colors import Color, WHITE
+from openpyxl.utils.exceptions import InvalidFileException
+
+from zipfile import BadZipfile
 
 from connect.reports.renderers.base import BaseRenderer
 from connect.reports.renderers.registry import register
@@ -16,14 +19,15 @@ from connect.reports.renderers.registry import register
 class XLSXRenderer(BaseRenderer):
     def render(self, data, output_file):
         start_time = datetime.now(tz=pytz.utc)
-        start_col_idx = self.kwargs.get('start_col', 1)
-        row_idx = self.kwargs.get('start_row', 2)
+        start_col_idx = self.args.get('start_col', 1)
+        row_idx = self.args.get('start_row', 2)
         wb = load_workbook(
             os.path.join(
                 self.root_dir,
                 self.template,
             ),
         )
+
         ws = wb['Data']
         for row in data:
             for col_idx, cell_value in enumerate(row, start=start_col_idx):
@@ -74,10 +78,10 @@ class XLSXRenderer(BaseRenderer):
         )
 
     @classmethod
-    def _validate_kwargs(cls, kwargs):
+    def _validate_args(cls, args):
         errors = []
-        start_row = kwargs.get('start_row')
-        start_col = kwargs.get('start_col')
+        start_row = args.get('start_row')
+        start_col = args.get('start_col')
         if start_row is not None:
             if not isinstance(start_row, int):
                 errors.append('`start_row` must be integer.')
@@ -97,11 +101,19 @@ class XLSXRenderer(BaseRenderer):
         errors = []
         if definition.template is None:
             errors.append('`template` is required for xlsx renderer.')
+            return errors
         elif not os.path.isfile(
             os.path.join(definition.root_path, definition.template),
         ):
             errors.append(f'template `{definition.template}` not found.')
+            return errors
 
-        if definition.kwargs is not None:
-            errors.extend(cls._validate_kwargs(definition.kwargs))
+        try:
+            template_file = os.path.join(definition.root_path, definition.template)
+            load_workbook(template_file)
+        except (InvalidFileException, BadZipfile):
+            errors.append(f'template `{definition.template}` not valid or empty.')
+
+        if definition.args is not None:
+            errors.extend(cls._validate_args(definition.args))
         return errors

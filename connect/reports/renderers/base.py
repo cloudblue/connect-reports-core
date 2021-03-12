@@ -9,14 +9,14 @@ class BaseRenderer(metaclass=ABCMeta):
         account,
         report,
         template=None,
-        kwargs=None,
+        args=None,
     ):
         self.environment = environment
         self.root_dir = root_dir
         self.account = account
         self.report = report
         self.template = template
-        self.kwargs = kwargs or {}
+        self.args = args or {}
         self.extra_context = None
 
     def get_context(self, data):

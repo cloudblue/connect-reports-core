@@ -6,8 +6,8 @@ from connect.reports.renderers import PDFRenderer
 from connect.reports.renderers.pdf import local_fetcher
 
 
-@pytest.mark.parametrize('kwargs', (None, {}, {'css_file': 'my/css_file.css'}))
-def test_validate_ok(mocker, kwargs):
+@pytest.mark.parametrize('args', (None, {}, {'css_file': 'my/css_file.css'}))
+def test_validate_ok(mocker, args):
     mocker.patch('connect.reports.renderers.pdf.os.path.isfile', return_value=True)
 
     defs = RendererDefinition(
@@ -16,7 +16,7 @@ def test_validate_ok(mocker, kwargs):
         type='pdf',
         description='description',
         template='template.html.j2',
-        kwargs=kwargs,
+        args=args,
     )
 
     assert PDFRenderer.validate(defs) == []
@@ -31,7 +31,7 @@ def test_validate_css_not_found(mocker):
         type='pdf',
         description='description',
         template='template.html.j2',
-        kwargs={'css_file': 'my/css_file.css'},
+        args={'css_file': 'my/css_file.css'},
     )
 
     assert PDFRenderer.validate(defs) == ['css_file `my/css_file.css` not found.']

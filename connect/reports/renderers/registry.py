@@ -31,9 +31,9 @@ def get_renderer_class(name):
     return _RENDERERS[name]
 
 
-def get_renderer(name, environment, project_dir, account, report, template=None, kwargs=None):
+def get_renderer(name, environment, project_dir, account, report, template=None, args=None):
     cls = get_renderer_class(name)
-    return cls(environment, project_dir, account, report, template, kwargs)
+    return cls(environment, project_dir, account, report, template, args)
 
 
 def get_renderers():

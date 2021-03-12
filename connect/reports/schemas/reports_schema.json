@@ -160,8 +160,8 @@
                     "description": "Renderer template file.",
                     "type": "string"
                 },
-                "kwargs": {
-                    "description": "Renderer extra keyword arguments.",
+                "args": {
+                    "description": "Renderer extra arguments.",
                     "type": "object"
                 }
             }

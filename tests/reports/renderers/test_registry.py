@@ -6,6 +6,7 @@ from connect.reports.renderers.registry import (
     RendererNotFoundError,
     get_renderer,
     get_renderer_class,
+    get_renderers,
     register,
 )
 
@@ -62,7 +63,7 @@ def test_get_renderer(registry, account_factory, report_factory):
 
     renderer = get_renderer(
         'test', 'runtime environment', 'root_dir',
-        account, report, template='template.file', kwargs={'a': 'b'},
+        account, report, template='template.file', args={'a': 'b'},
     )
 
     assert isinstance(renderer, TestRenderer)
@@ -71,4 +72,13 @@ def test_get_renderer(registry, account_factory, report_factory):
     assert renderer.account == account
     assert renderer.report == report
     assert renderer.template == 'template.file'
-    assert renderer.kwargs == {'a': 'b'}
+    assert renderer.args == {'a': 'b'}
+
+
+def test_renderers():
+    @register('new_one')
+    class NewRenderer(BaseRenderer):
+        pass
+
+    renderers = get_renderers()
+    assert 'new_one' in renderers
