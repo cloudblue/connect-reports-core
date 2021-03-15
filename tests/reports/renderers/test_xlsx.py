@@ -3,22 +3,26 @@ from datetime import datetime
 
 import pytest
 
+from fs.tempfs import TempFS
+
+from openpyxl import Workbook
+
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import XLSXRenderer
 
 
-@pytest.mark.parametrize('kwargs', (None, {}, {'start_row': 1, 'start_col': 1}))
-def test_validate_ok(mocker, kwargs):
-    mocker.patch('connect.reports.renderers.xlsx.os.path.isfile', return_value=True)
-
+@pytest.mark.parametrize('args', (None, {}, {'start_row': 1, 'start_col': 1}))
+def test_validate_ok(mocker, args):
+    tmp_fs = TempFS()
     defs = RendererDefinition(
-        root_path='root_path',
+        root_path=tmp_fs.root_path,
         id='renderer_id',
         type='xlsx',
         description='description',
         template='template.xlsx',
-        kwargs=kwargs,
+        args=args,
     )
+    _create_xlsx_doc(f'{tmp_fs.root_path}/{defs.template}')
 
     assert XLSXRenderer.validate(defs) == []
 
@@ -48,7 +52,7 @@ def test_validate_template_not_found(mocker):
 
 
 @pytest.mark.parametrize(
-    ('kwargs', 'error'),
+    ('args', 'error'),
     (
         ({'start_row': 'a'}, '`start_row` must be integer.'),
         ({'start_col': 'a'}, '`start_col` must be integer.'),
@@ -58,16 +62,17 @@ def test_validate_template_not_found(mocker):
         ({'start_col': -3}, '`start_col` must be greater than 0.'),
     ),
 )
-def test_validate_invalid_kwargs(mocker, kwargs, error):
-    mocker.patch('connect.reports.renderers.xlsx.os.path.isfile', return_value=True)
+def test_validate_invalid_args(mocker, args, error):
+    tmp_fs = TempFS()
     defs = RendererDefinition(
-        root_path='root_path',
+        root_path=tmp_fs.root_path,
         id='renderer_id',
         type='xlsx',
         description='description',
         template='template.xlsx',
-        kwargs=kwargs,
+        args=args,
     )
+    _create_xlsx_doc(f'{tmp_fs.root_path}/{defs.template}')
 
     assert XLSXRenderer.validate(defs) == [error]
 
@@ -136,3 +141,30 @@ def test_add_info_sheet(mocker, account_factory, report_factory):
     assert mocked_cells['B7'].value == report.name
     assert mocked_cells['B8'].value == 'runtime environment'
     assert json.loads(mocked_cells['B9'].value) == values
+
+
+def test_validate_template_not_valid():
+
+    tmp_filesystem = TempFS()
+    tmp_filesystem.create('test.xlsx')
+
+    defs = RendererDefinition(
+        root_path=tmp_filesystem.root_path,
+        id='renderer_id',
+        type='xlsx',
+        description='description',
+        template='test.xlsx',
+    )
+
+    errors = XLSXRenderer.validate(defs)
+
+    assert 'not valid or empty' in errors[0]
+
+
+def _create_xlsx_doc(xlsx_path):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "test"
+    for _ in range(1, 10):
+        ws.append(range(10))
+    wb.save(xlsx_path)

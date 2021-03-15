@@ -30,7 +30,7 @@ def renderer_json():
     def _renderer_data(
         id='renderer_id', type='xlsx',
         description='XLSX renderer', template=None,
-        kwargs=None,
+        args=None,
     ):
         data = {
             'id': id,
@@ -40,8 +40,8 @@ def renderer_json():
         if template is not None:
             data['template'] = template
 
-        if kwargs is not None:
-            data['kwargs'] = kwargs
+        if args is not None:
+            data['args'] = args
 
         return data
 

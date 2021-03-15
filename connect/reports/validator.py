@@ -68,7 +68,7 @@ def _validate_renderer(report, renderer):
     errors = []
     if renderer.type not in get_renderers():
         errors.append(
-            f'report `{report.local_id}` property `readme_file` cannot be resolved to a file.',
+            f'renderer `{renderer.id}` of type `{renderer.type}` is not known.',
         )
         return errors
 
@@ -89,14 +89,15 @@ def _validate_report(report):
     tokens = report.entrypoint.split('.')
     if len(tokens) < 2:
         errors.append(
-            f'entrypoint `{report.entrypoint}` does not complain with the package structure.',
+            f'entrypoint `{report.entrypoint}` does not follow the package structure.',
         )
+        return errors
 
     report_root = os.path.join(report.root_path, tokens[0], tokens[1])
-
     if not (os.path.isdir(report_root) or os.path.isfile(f'{report_root}.py')):
         errors.append(
-            f'entrypoint `{report.entrypoint}` does not complain with the package structure.',
+            f'entrypoint `{report.entrypoint}` directory structure '
+            'does not match the package definition.',
         )
 
     renderers_ids = []
