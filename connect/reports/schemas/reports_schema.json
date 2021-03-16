@@ -22,19 +22,16 @@
         "reports": {
             "description": "List of reports.",
             "type": "array",
-            "items": { 
-                "oneOf": [
-                    { "$ref": "#/definitions/report_v1" },
-                    { "$ref": "#/definitions/report_v2" }
-                ]
+            "items": {
+                "$ref": "#/definitions/report"
             },
             "minItems": 1
         }
     },
     "definitions": {
-        "report_v1": {
+        "report": {
             "type": "object",
-            "required": [ "name", "readme_file", "template", "start_row", "start_col", "entrypoint", "audience", "report_spec" ],
+            "required": [ "name", "readme_file", "entrypoint", "audience", "report_spec" ],
             "properties": {
                 "name": {
                     "description": "Report name.",
@@ -43,20 +40,6 @@
                 "readme_file": {
                     "description": "Report description file.",
                     "type": "string"
-                },
-                "template": {
-                    "description": "Report MS excel template.",
-                    "type": "string"
-                },
-                "start_row": {
-                    "description": "Excel Row to start reading the report.",
-                    "type": "number",
-                    "minimum": 1
-                },
-                "start_col": {
-                    "description": "Excel Column to start reading the report.",
-                    "type": "number",
-                    "minimum": 1
                 },
                 "entrypoint": {
                     "description": "Function to call for generating the report.",
@@ -73,7 +56,7 @@
                 "report_spec": {
                     "description": "Report specification",
                     "type": "string",
-                    "enum": ["1"]
+                    "enum": ["1", "2"]
                 },
                 "parameters": {
                     "description": "List of parameters.",
@@ -83,62 +66,55 @@
                     },
                     "minItems": 0
                 }
-            }
-        },
-        "report_v2": {
-            "type": "object",
-            "required": [ 
-                "name", "readme_file", "entrypoint", "audience", "report_spec", "renderers",
-                "default_renderer"
-            ],
-            "properties": {
-                "name": {
-                    "description": "Report name.",
-                    "type": "string"
-                },
-                "readme_file": {
-                    "description": "Report description file.",
-                    "type": "string"
-                },
-                "entrypoint": {
-                    "description": "Function to call for generating the report.",
-                    "type": "string"
-                },
-                "audience": {
-                    "description": "Report audience",
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "enum": ["provider", "vendor"]
+            },
+            "allOf": [
+                {
+                    "if": {
+                        "properties": { "report_spec": { "enum": [ "1" ] } }
                     },
-                    "minItems": 1
+                    "then": {
+                        "required": [ "template", "start_row", "start_col" ],
+                        "properties": {
+                            "template": {
+                                "description": "Report MS excel template.",
+                                "type": "string"
+                            },
+                            "start_row": {
+                                "description": "Excel Row to start reading the report.",
+                                "type": "number",
+                                "minimum": 1
+                            },
+                            "start_col": {
+                                "description": "Excel Column to start reading the report.",
+                                "type": "number",
+                                "minimum": 1
+                            }
+                        }
+                    }
                 },
-                "report_spec": {
-                    "description": "Report specification",
-                    "type": "string",
-                    "enum": ["2"]
-                },
-                "renderers": {
-                    "description": "List of available renderers.",
-                    "type": "array",
-                    "items": { 
-                        "$ref": "#/definitions/renderer"
+                {
+                    "if": {
+                        "properties": { "report_spec": { "enum": [ "2" ] } }
                     },
-                    "minItems": 1
-                },
-                "default_renderer": {
-                    "description": "Default renderer to use.",
-                    "type": "string"
-                },
-                "parameters": {
-                    "description": "List of parameters.",
-                    "type": "array",
-                    "items": { 
-                        "$ref": "#/definitions/parameter"
-                    },
-                    "minItems": 0
+                    "then": {
+                        "required": [ "renderers", "default_renderer" ],
+                        "properties": {
+                            "renderers": {
+                                "description": "List of available renderers.",
+                                "type": "array",
+                                "items": { 
+                                    "$ref": "#/definitions/renderer"
+                                },
+                                "minItems": 1
+                            },
+                            "default_renderer": {
+                                "description": "Default renderer to use.",
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
-            }
+            ]
         },
         "renderer": {
             "type" : "object",
@@ -161,7 +137,7 @@
                     "type": "string"
                 },
                 "args": {
-                    "description": "Renderer extra arguments.",
+                    "description": "Renderer extra keyword arguments.",
                     "type": "object"
                 }
             }
