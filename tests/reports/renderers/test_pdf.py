@@ -1,5 +1,6 @@
 import pytest
 
+from fs.tempfs import TempFS
 
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import PDFRenderer
@@ -81,3 +82,68 @@ def test_render(mocker, account_factory, report_factory, report_data):
 
     html.write_pdf.assert_called_once_with('report.pdf')
     mocked_unlink.assert_called_once_with('report.temp')
+
+
+def test_validate_tmpfs_template_wrong_name():
+    tmp_fs = TempFS()
+    tmp_fs.makedirs('package/report')
+    tmp_fs.create('package/report/template.html.j3')
+    definition = RendererDefinition(
+        root_path=tmp_fs.root_path,
+        id='renderer_id',
+        type='pdf',
+        description='description',
+        template='package/report/template.html.j3',
+        args={'css_file': 'my/css_file.css'},
+    )
+    errors = PDFRenderer.validate(definition)
+
+    assert f"invalid template name: `{definition.template}`" in errors[0]
+
+
+def test_validate_tmpfs_css_missing():
+    tmp_fs = TempFS()
+    tmp_fs.makedirs('package/report')
+    tmp_fs.create('package/report/template.html.j2')
+    definition = RendererDefinition(
+        root_path=tmp_fs.root_path,
+        id='renderer_id',
+        type='pdf',
+        description='description',
+        template='package/report/template.html.j2',
+        args={'css_file': 'package/report/css_file.css'},
+    )
+    errors = PDFRenderer.validate(definition)
+
+    assert f"css_file `{definition.args['css_file']}` not found." == errors[0]
+
+
+def test_render_tmpfs_ok(report_data, account_factory, report_factory):
+    tmp_fs = TempFS()
+    tmp_fs.makedirs('package/report')
+    with tmp_fs.open('package/report/template.html.j2', 'w') as fp:
+        fp.write('''
+            <html>
+                <head><title>PDF Report</title></head>
+                <body>
+                    <ul>
+                        {% for item in data %}
+                        <li>{{item[0]}} {{item[1]}}</li>
+                        {% endfor %}
+                    </ul>
+                </body>
+            </html>
+        ''')
+    renderer = PDFRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+        template='package/report/template.html.j2',
+    )
+    data = report_data(2, 2)
+    path_to_output = f'{tmp_fs.root_path}/package/report/report'
+    output_file = renderer.render(data, path_to_output)
+
+    assert output_file == f'{path_to_output}.pdf'
+    assert 'PDF Report' in str(open(output_file, 'rb').read())

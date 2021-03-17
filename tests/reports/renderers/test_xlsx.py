@@ -5,7 +5,7 @@ import pytest
 
 from fs.tempfs import TempFS
 
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import XLSXRenderer
@@ -161,10 +161,40 @@ def test_validate_template_not_valid():
     assert 'not valid or empty' in errors[0]
 
 
+def test_render_tmpfs_ok(account_factory, report_factory, report_data):
+    tmp_fs = TempFS()
+    tmp_fs.makedirs('package/report')
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Data'
+    ws.cell(1, 1, value='Name')
+    ws.cell(1, 2, value='Description')
+    wb.save(f'{tmp_fs.root_path}/package/report/template.xlsx')
+
+    renderer = XLSXRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+        template='package/report/template.xlsx',
+    )
+
+    data = report_data(2, 2)
+    path_to_output = f'{tmp_fs.root_path}/package/report/report'
+    output_file = renderer.render(data, path_to_output)
+
+    wb = load_workbook(output_file)
+    ws = wb['Data']
+
+    assert output_file == f'{path_to_output}.xlsx'
+    assert data == [[ws[f'A{item}'].value, ws[f'B{item}'].value] for item in range(2, 4)]
+
+
 def _create_xlsx_doc(xlsx_path):
     wb = Workbook()
     ws = wb.active
-    ws.title = "test"
+    ws.title = 'Data'
     for _ in range(1, 10):
         ws.append(range(10))
     wb.save(xlsx_path)

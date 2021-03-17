@@ -2,6 +2,8 @@ import os
 
 import pytest
 
+from fs.tempfs import TempFS
+
 from connect.reports.datamodels import (
     ParameterDefinition,
     ReportDefinition,
@@ -58,3 +60,27 @@ def test_repository_definition_description(mocker, repo_json):
     defs = RepositoryDefinition(root_path='root_path', **repo_data)
     assert defs.description == expected_descr
     assert mocked_open.mock_calls[0].args == (expected_readme_path, 'r')
+
+
+def test_report_tempfs_definition_description(report_v2_json):
+    expected_descr = 'This is the report markdown description'
+    tmp_fs = TempFS()
+    with tmp_fs.open('readme.md', 'w') as fp:
+        fp.write(expected_descr)
+
+    report_json = report_v2_json(readme_file='readme.md')
+    defs = ReportDefinition(root_path=tmp_fs.root_path, **report_json)
+
+    assert defs.description == expected_descr
+
+
+def test_repository_tempfs_definition_description(repo_json):
+    expected_descr = 'This is the repository markdown description'
+    tmp_fs = TempFS()
+    with tmp_fs.open('readme.md', 'w') as fp:
+        fp.write(expected_descr)
+
+    repo_data = repo_json(readme_file='readme.md')
+    defs = RepositoryDefinition(root_path=tmp_fs.root_path, **repo_data)
+
+    assert defs.description == expected_descr
