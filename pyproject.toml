@@ -7,6 +7,19 @@ license = "Apache 2"
 packages = [
     { include = "connect" },
 ]
+readme = "./README.md"
+homepage = "https://connect.cloudblue.com"
+repository = "https://github.com/cloudblue/connect-reports-core"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Utilities",
+    "Topic :: Software Development :: Libraries",
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
