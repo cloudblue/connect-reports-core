@@ -69,7 +69,7 @@ class XLSXRenderer(BaseRenderer):
         ws['B7'].value = self.report.name
         ws['A8'].value = 'Runtime environment'
         ws['B8'].value = self.environment
-        ws['A9'].value = 'Report execution paramters'
+        ws['A9'].value = 'Report execution parameters'
         ws['B9'].value = json.dumps(self.report.values, indent=4, sort_keys=True)
         ws['B9'].alignment = Alignment(
             horizontal='left',

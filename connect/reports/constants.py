@@ -1,0 +1,4 @@
+# RUNTIME ENVIRONMENT VALUES
+
+CLI_ENV = 'CLI Tool'
+REPORTS_ENV = 'Connect Reports'
