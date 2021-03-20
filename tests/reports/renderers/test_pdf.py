@@ -88,13 +88,14 @@ def test_validate_tmpfs_template_wrong_name():
     tmp_fs = TempFS()
     tmp_fs.makedirs('package/report')
     tmp_fs.create('package/report/template.html.j3')
+    tmp_fs.create('css_file.css')
     definition = RendererDefinition(
         root_path=tmp_fs.root_path,
         id='renderer_id',
         type='pdf',
         description='description',
         template='package/report/template.html.j3',
-        args={'css_file': 'my/css_file.css'},
+        args={'css_file': 'css_file.css'},
     )
     errors = PDFRenderer.validate(definition)
 
