@@ -77,6 +77,7 @@ def test_render(mocker, account_factory, report_factory, report_data, extra_cont
     account = account_factory()
     report = report_factory()
     fsloader = mocker.MagicMock()
+    sauto = mocker.MagicMock()
     stream_mock = mocker.MagicMock()
     template_mock = mocker.MagicMock()
     template_mock.stream.return_value = stream_mock
@@ -85,6 +86,10 @@ def test_render(mocker, account_factory, report_factory, report_data, extra_cont
     mocked_open = mocker.mock_open()
     mocker.patch('connect.reports.renderers.j2.open', mocked_open)
     mocked_tmpdir = mocker.patch('connect.reports.renderers.j2.tempfile.TemporaryDirectory')
+    mocked_autoescape = mocker.patch(
+        'connect.reports.renderers.j2.select_autoescape',
+        return_value=sauto,
+    )
     mocked_zipfile = mocker.patch('connect.reports.renderers.j2.zipfile.ZipFile')
     mocked_loader = mocker.patch(
         'connect.reports.renderers.j2.FileSystemLoader',
@@ -110,7 +115,10 @@ def test_render(mocker, account_factory, report_factory, report_data, extra_cont
         assert 'desc' in ctx['extra_context']
 
     mocked_loader.assert_called_once_with('root_dir/report_root')
-    mocked_environment.assert_called_once_with(loader=fsloader)
+    mocked_environment.assert_called_once_with(
+        loader=fsloader,
+        autoescape=sauto,
+    )
     env.get_template.assert_called_once_with('template.csv.j2')
     template_mock.stream.assert_called_once_with(ctx)
     stream_mock.dump.assert_called_once()
@@ -118,6 +126,7 @@ def test_render(mocker, account_factory, report_factory, report_data, extra_cont
     assert mocked_open.mock_calls[0].args[1] == 'w'
     assert mocked_zipfile.call_count == 1
     assert mocked_tmpdir.call_count == 1
+    assert mocked_autoescape.call_count == 1
 
 
 def test_validate_tempfs_ok():
