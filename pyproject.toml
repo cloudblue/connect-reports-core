@@ -3,7 +3,7 @@ name = "connect-reports-core"
 version = "0.1.0"
 description = "Connect Reports Core"
 authors = ["CloudBlue LLC"]
-license = "Apache 2"
+license = "Apache-2.0"
 packages = [
     { include = "connect" },
 ]

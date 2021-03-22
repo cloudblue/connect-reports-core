@@ -6,7 +6,11 @@ import zipfile
 
 import pytz
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import (
+    Environment,
+    FileSystemLoader,
+    select_autoescape,
+)
 
 from connect.reports.renderers.base import BaseRenderer
 from connect.reports.renderers.registry import register
@@ -17,7 +21,10 @@ class Jinja2Renderer(BaseRenderer):
     def render(self, data, output_file):
         path, name = self.template.rsplit('/', 1)
         loader = FileSystemLoader(os.path.join(self.root_dir, path))
-        env = Environment(loader=loader)
+        env = Environment(
+            loader=loader,
+            autoescape=select_autoescape(['html', 'xml']),
+        )
         template = env.get_template(name)
         _, ext, _ = name.rsplit('.', 2)
 
