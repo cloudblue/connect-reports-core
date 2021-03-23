@@ -4,7 +4,8 @@
 
 ## Introduction
 
-`Connect Reports Core` is the kernel package for handling reports on CloudBlue Connect Ecosystem. This library is reponsible to validate reports definition, to choose render for parsing process and to write results of the report execution.
+`Connect Reports Core` is the kernel package for handling reports on CloudBlue Connect Ecosystem. 
+This library is reponsible for validation of reports definition, choosing of renderer for parsing process and writing results of reports execution.
 
 
 ## Install
@@ -22,6 +23,24 @@
 
 ```
 $ pip install connect-reports-core
+```
+
+## Testing
+
+On MacOs:
+* Install system dependencies
+```commandline
+brew install py3cairo pango
+```
+* Create virtualenv
+* Install project dependencies
+```commandline
+pip install poetry
+poetry update
+```
+* Run tests
+```commandline
+poetry run pytest
 ```
 
 

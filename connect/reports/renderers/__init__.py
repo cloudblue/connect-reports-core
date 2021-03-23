@@ -1,3 +1,5 @@
+#  Copyright © 2021 CloudBlue. All rights reserved.
+
 from connect.reports.renderers.registry import (  # noqa
     get_renderers,
     get_renderer_class,

@@ -1,3 +1,5 @@
+#  Copyright © 2021 CloudBlue. All rights reserved.
+
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers.csv import CSVRenderer
 
