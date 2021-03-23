@@ -1,6 +1,8 @@
 import os
 import shutil
 from functools import partial
+import tempfile
+import zipfile
 
 from weasyprint import HTML, default_url_fetcher
 
@@ -29,23 +31,33 @@ def local_fetcher(url, root_dir=None, template_dir=None):
 @register('pdf')
 class PDFRenderer(Jinja2Renderer):
     def render(self, data, output_file):
-        rendered_file = super().render(data, output_file)
-        temp_file = f'{output_file}.temp'
-        shutil.move(
-            rendered_file,
-            temp_file,
-        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            zip_filepath = super().render(data, output_file)
+            with zipfile.ZipFile(zip_filepath) as zip_file:
+                zip_file.extract(member='report.html', path=tmpdir)
+                zip_file.extract(member='summary.json', path=tmpdir)
 
-        fetcher = partial(
-            local_fetcher,
-            root_dir=self.root_dir,
-            template_dir=os.path.dirname(self.template),
-        )
+            os.remove(zip_filepath)
+            shutil.move(
+                f'{tmpdir}/report.html',
+                f'{tmpdir}/report.tmp',
+            )
+            fetcher = partial(
+                local_fetcher,
+                root_dir=self.root_dir,
+                template_dir=os.path.dirname(self.template),
+            )
 
-        html = HTML(filename=temp_file, url_fetcher=fetcher)
-        output_file = f'{output_file}.pdf'
-        html.write_pdf(output_file)
-        os.unlink(temp_file)
+            html = HTML(filename=f'{tmpdir}/report.tmp', url_fetcher=fetcher)
+            report_file = f'{tmpdir}/report.pdf'
+            html.write_pdf(report_file)
+
+            summary_file = f'{tmpdir}/summary.json'
+            output_file = f'{output_file}.zip'
+            with zipfile.ZipFile(output_file, 'w') as repfile:
+                repfile.write(report_file, os.path.basename(report_file))
+                repfile.write(summary_file, os.path.basename(summary_file))
+
         return output_file
 
     @classmethod

@@ -2,6 +2,8 @@ import pytest
 
 from fs.tempfs import TempFS
 
+from zipfile import ZipFile
+
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import PDFRenderer
 from connect.reports.renderers.pdf import local_fetcher
@@ -56,14 +58,15 @@ def test_local_fetcher(mocker, url, expected_url):
 
 
 def test_render(mocker, account_factory, report_factory, report_data):
-    mocker.patch('connect.reports.renderers.pdf.Jinja2Renderer.render', return_value='report.html')
+    mocker.patch('connect.reports.renderers.pdf.Jinja2Renderer.render', return_value='report.zip')
     mocked_mv = mocker.patch('connect.reports.renderers.pdf.shutil.move')
     html = mocker.MagicMock()
     mocked_html = mocker.patch('connect.reports.renderers.pdf.HTML', return_value=html)
     fetcher = mocker.MagicMock()
     mocked_partial = mocker.patch('connect.reports.renderers.pdf.partial', return_value=fetcher)
-    mocked_unlink = mocker.patch('connect.reports.renderers.pdf.os.unlink')
-
+    mocked_tmpdir = mocker.patch('connect.reports.renderers.pdf.tempfile.TemporaryDirectory')
+    mocked_zipfile = mocker.patch('connect.reports.renderers.pdf.zipfile.ZipFile')
+    mocked_remove = mocker.patch('connect.reports.renderers.pdf.os.remove')
     renderer = PDFRenderer(
         'runtime environment', 'root_dir',
         account_factory(),
@@ -71,17 +74,18 @@ def test_render(mocker, account_factory, report_factory, report_data):
         template='report_dir/template.html.j2',
     )
     data = report_data()
-    assert renderer.render(data, 'report') == 'report.pdf'
-
-    mocked_mv.assert_called_once_with('report.html', 'report.temp')
+    output_file = renderer.render(data, 'report')
+    assert output_file == 'report.zip'
     mocked_partial.assert_called_once_with(
         local_fetcher, root_dir='root_dir', template_dir='report_dir',
     )
-    assert mocked_html.mock_calls[0].kwargs['filename'] == 'report.temp'
+    assert mocked_html.mock_calls[0].kwargs['filename'].split('/')[-1] == 'report.tmp'
     assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
-
-    html.write_pdf.assert_called_once_with('report.pdf')
-    mocked_unlink.assert_called_once_with('report.temp')
+    html.write_pdf.assert_called_once()
+    mocked_mv.assert_called_once()
+    assert mocked_tmpdir.call_count == 1
+    assert mocked_zipfile.call_count == 2
+    assert mocked_remove.call_count == 1
 
 
 def test_validate_tmpfs_template_wrong_name():
@@ -146,5 +150,9 @@ def test_render_tmpfs_ok(report_data, account_factory, report_factory):
     path_to_output = f'{tmp_fs.root_path}/package/report/report'
     output_file = renderer.render(data, path_to_output)
 
-    assert output_file == f'{path_to_output}.pdf'
-    assert 'PDF Report' in str(open(output_file, 'rb').read())
+    assert output_file == f'{path_to_output}.zip'
+
+    with ZipFile(output_file) as zip_file:
+        assert sorted(zip_file.namelist()) == ['report.pdf', 'summary.json']
+        with zip_file.open('report.pdf', 'r') as fp:
+            assert 'PDF Report' in str(fp.read())
