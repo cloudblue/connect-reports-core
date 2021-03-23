@@ -1,3 +1,5 @@
+#  Copyright © 2021 CloudBlue. All rights reserved.
+
 import json
 import os
 from datetime import datetime

@@ -1,3 +1,5 @@
+#  Copyright © 2021 CloudBlue. All rights reserved.
+
 import pytest
 
 from connect.reports.renderers.base import BaseRenderer

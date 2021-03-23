@@ -1,3 +1,5 @@
+#  Copyright © 2021 CloudBlue. All rights reserved.
+
 import os
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List
