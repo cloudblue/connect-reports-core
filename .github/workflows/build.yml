@@ -1,4 +1,4 @@
-name: Build Connect Reports Renderers
+name: Build Connect Reports Core
 
 on:
   push:
