@@ -57,7 +57,7 @@ def test_get_renderer_class_not_found(registry):
 def test_get_renderer(registry, account_factory, report_factory):
     @register('test')
     class TestRenderer(BaseRenderer):
-        def render(self, data, output_file):
+        def generate_report(self, data, output_file):
             pass
 
     account = account_factory()

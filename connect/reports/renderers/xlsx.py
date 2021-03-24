@@ -19,8 +19,11 @@ from connect.reports.renderers.registry import register
 
 @register('xlsx')
 class XLSXRenderer(BaseRenderer):
-    def render(self, data, output_file):
-        start_time = datetime.now(tz=pytz.utc)
+    def render(self, data, output_file, start_time):
+        self.start_time = start_time or datetime.now(tz=pytz.utc)
+        return self.generate_report(data, output_file)
+
+    def generate_report(self, data, output_file):
         start_col_idx = self.args.get('start_col', 1)
         row_idx = self.args.get('start_row', 2)
         wb = load_workbook(
@@ -29,13 +32,14 @@ class XLSXRenderer(BaseRenderer):
                 self.template,
             ),
         )
-
         ws = wb['Data']
         for row in data:
             for col_idx, cell_value in enumerate(row, start=start_col_idx):
                 ws.cell(row_idx, col_idx, value=cell_value)
             row_idx += 1
-        self._add_info_sheet(wb.create_sheet('Info'), start_time)
+
+        self._add_info_sheet(wb.create_sheet('Info'), self.start_time)
+
         output_file = f'{output_file}.xlsx'
         wb.save(output_file)
         return output_file

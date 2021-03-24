@@ -1,7 +1,6 @@
 #  Copyright © 2021 CloudBlue. All rights reserved.
 
 import os
-import shutil
 from functools import partial
 
 from weasyprint import HTML, default_url_fetcher
@@ -30,24 +29,19 @@ def local_fetcher(url, root_dir=None, template_dir=None):
 
 @register('pdf')
 class PDFRenderer(Jinja2Renderer):
-    def render(self, data, output_file):
-        rendered_file = super().render(data, output_file)
-        temp_file = f'{output_file}.temp'
-        shutil.move(
-            rendered_file,
-            temp_file,
-        )
+    def generate_report(self, data, output_file):
+        tokens = output_file.split('.')
+        if tokens[-1] != 'pdf':
+            output_file = f'{tokens[0]}.pdf'
 
+        rendered_file = super().generate_report(data, output_file)
         fetcher = partial(
             local_fetcher,
             root_dir=self.root_dir,
             template_dir=os.path.dirname(self.template),
         )
-
-        html = HTML(filename=temp_file, url_fetcher=fetcher)
-        output_file = f'{output_file}.pdf'
+        html = HTML(filename=rendered_file, url_fetcher=fetcher)
         html.write_pdf(output_file)
-        os.unlink(temp_file)
         return output_file
 
     @classmethod

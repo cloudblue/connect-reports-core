@@ -20,7 +20,7 @@ def test_validate_ok():
     assert CSVRenderer.validate(defs) == []
 
 
-def test_render_tmpfs_ok(account_factory, report_factory):
+def test_render(account_factory, report_factory):
     with TempFS() as tmp_fs:
         data = [['line1'], ['line2']]
         renderer = CSVRenderer(
@@ -34,7 +34,7 @@ def test_render_tmpfs_ok(account_factory, report_factory):
         assert output_file == f'{tmp_fs.root_path}/report.zip'
 
         with ZipFile(output_file) as repzip:
-            assert sorted(repzip.namelist()) == ['report.csv', 'summary.csv']
+            assert sorted(repzip.namelist()) == ['report.csv', 'summary.json']
             with repzip.open('report.csv') as repfile:
                 content = repfile.read().decode('utf-8').split()
                 assert content[0] == f'"{data[0][0]}"'
