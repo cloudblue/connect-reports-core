@@ -19,7 +19,7 @@ from connect.reports.renderers.registry import register
 
 @register('xlsx')
 class XLSXRenderer(BaseRenderer):
-    def render(self, data, output_file, start_time):
+    def render(self, data, output_file, start_time=None):
         self.start_time = start_time or datetime.now(tz=pytz.utc)
         return self.generate_report(data, output_file)
 
