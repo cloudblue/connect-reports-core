@@ -1,4 +1,5 @@
 #  Copyright © 2021 CloudBlue. All rights reserved.
+import os
 
 import pytest
 
@@ -79,7 +80,7 @@ def test_generate_report(mocker, account_factory, report_factory, report_data):
     assert renderer.generate_report(data, 'report.pdf') == 'report.pdf'
 
     mocked_partial.assert_called_once_with(
-        local_fetcher, root_dir='root_dir', template_dir='report_dir',
+        local_fetcher, root_dir='root_dir', template_dir='report_dir', cwd=os.getcwd(),
     )
     assert mocked_html.mock_calls[0].kwargs['filename'] == 'report.pdf.html'
     assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
