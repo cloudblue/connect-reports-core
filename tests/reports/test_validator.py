@@ -63,6 +63,7 @@ def test_validator_renderer_unknown_type(param_json, renderer_type):
         'root_path': tmp_fs.root_path,
         'id': '123',
         'type': renderer_type,
+        'default': True,
         'description': 'Renderer',
     }
     renderer = RendererDefinition(**renderer_dict)
@@ -70,7 +71,6 @@ def test_validator_renderer_unknown_type(param_json, renderer_type):
         root_path=tmp_fs.root_path,
         **report_dict,
         renderers=[renderer],
-        default_renderer=renderer.id,
     )
 
     errors = _validate_renderer(report, renderer)
@@ -87,9 +87,10 @@ def test_validator_readme_file_not_existing(report_v2_json):
         'id': '321',
         'type': 'json',
         'description': 'JSON Renderer',
+        'default': True,
     }
     renderer = RendererDefinition(**renderer_json_dict)
-    report_dict = report_v2_json(renderers=[renderer], default_renderer=renderer.id)
+    report_dict = report_v2_json(renderers=[renderer])
     report = ReportDefinition(
         root_path='root_path',
         **report_dict,
@@ -114,7 +115,6 @@ def test_validator_entrypoint_bad_format(report_v2_json):
         readme_file='readme.md',
         entrypoint='mypackage',
         renderers=[renderer],
-        default_renderer=str(renderer),
     )
     report = ReportDefinition(
         root_path=tmp_filesystem.root_path,
@@ -134,12 +134,12 @@ def test_validator_entrypoint_bad_directory_structure(report_v2_json):
         'id': '321',
         'type': 'json',
         'description': 'JSON Renderer',
+        'default': True,
     }
     renderer = RendererDefinition(**renderer_json_dict)
     report_dict = report_v2_json(
         readme_file='readme.md',
         renderers=[renderer],
-        default_renderer=str(renderer),
     )
     report = ReportDefinition(
         root_path=tmp_filesystem.root_path,
@@ -168,13 +168,13 @@ def test_validator_duplicate_renderers_error(param_json):
         'id': '123',
         'type': 'csv',
         'description': 'CSV Renderer',
+        'default': True,
     }
     renderer = RendererDefinition(**renderer_dict)
     report = ReportDefinition(
         root_path=tmp_fs.root_path,
         **report_dict,
         renderers=[renderer, renderer],
-        default_renderer=str(renderer),
     )
     errors = _validate_report(report)
 
@@ -199,19 +199,19 @@ def test_validator_ok(param_json):
         'id': '123',
         'type': 'csv',
         'description': 'CSV Renderer',
+        'default': True,
     }
     csv_renderer = RendererDefinition(**renderer_csv_dict)
     report = ReportDefinition(
         root_path=tmp_fs.root_path,
         **report_dict,
         renderers=[csv_renderer],
-        default_renderer=csv_renderer.id,
     )
     errors = _validate_report(report)
     assert len(errors) == 0
 
 
-def test_validator_wrong_default_renderer(param_json):
+def test_validator_multiple_default_renderer(param_json):
     report_dict = {
         'name': 'Report',
         'readme_file': 'readme.md',
@@ -228,24 +228,25 @@ def test_validator_wrong_default_renderer(param_json):
         'id': '321',
         'type': 'json',
         'description': 'JSON Renderer',
+        'default': True,
     }
     renderer_csv_dict = {
         'root_path': tmp_fs.root_path,
         'id': '123',
         'type': 'csv',
         'description': 'CSV Renderer',
+        'default': True,
     }
     csv_renderer = RendererDefinition(**renderer_csv_dict)
     json_renderer = RendererDefinition(**renderer_json_dict)
     report = ReportDefinition(
         root_path=tmp_fs.root_path,
         **report_dict,
-        renderers=[csv_renderer],
-        default_renderer=json_renderer.id,
+        renderers=[csv_renderer, json_renderer],
     )
     errors = _validate_report(report)
     assert len(errors) != 0
-    assert f'does not exist: {report.default_renderer}' in errors[0]
+    assert f'report {report.local_id} has multiple default renderers:' in errors[0]
 
 
 def test_validator_repo_readme_file_missing(param_json):
@@ -262,13 +263,13 @@ def test_validator_repo_readme_file_missing(param_json):
         'id': '123',
         'type': 'csv',
         'description': 'CSV Renderer',
+        'default': True,
     }
     csv_renderer = RendererDefinition(**renderer_csv_dict)
     report = ReportDefinition(
         root_path='root_path',
         **report_dict,
         renderers=[csv_renderer],
-        default_renderer=csv_renderer.id,
     )
     repo_dict = {
         'name': 'Reports Repository',
@@ -310,19 +311,18 @@ def test_validator_repo_duplicated_reports(mocker, param_json):
         'id': '123',
         'type': 'csv',
         'description': 'CSV Renderer',
+        'default': True,
     }
     csv_renderer = RendererDefinition(**renderer_csv_dict)
     report_1 = ReportDefinition(
         root_path='root_path',
         **report_dict_1,
         renderers=[csv_renderer],
-        default_renderer=csv_renderer.id,
     )
     report_2 = ReportDefinition(
         root_path='root_path',
         **report_dict_2,
         renderers=[csv_renderer],
-        default_renderer=csv_renderer.id,
     )
     tmp_filesystem = TempFS()
     tmp_filesystem.create('readme.md')

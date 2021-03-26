@@ -29,6 +29,7 @@ def parse(root_path, data):
                     id=default_renderer,
                     type='xlsx',
                     description='Render report to Excel.',
+                    default=True,
                     template=template,
                     args={
                         'start_row': start_row,
@@ -36,7 +37,6 @@ def parse(root_path, data):
                     }),
             ]
         if report['report_spec'] == '2':
-            default_renderer = report.pop('default_renderer')
             renderers_definitions = [
                 RendererDefinition(root_path=root_path, **renderer)
                 for renderer in report.pop('renderers')
@@ -45,7 +45,6 @@ def parse(root_path, data):
         reports_definitions.append(
             ReportDefinition(
                 root_path=root_path,
-                default_renderer=default_renderer,
                 parameters=parameters_definitions,
                 renderers=renderers_definitions,
                 **report,

@@ -97,7 +97,7 @@
                         "properties": { "report_spec": { "enum": [ "2" ] } }
                     },
                     "then": {
-                        "required": [ "renderers", "default_renderer" ],
+                        "required": [ "renderers" ],
                         "properties": {
                             "renderers": {
                                 "description": "List of available renderers.",
@@ -106,10 +106,6 @@
                                     "$ref": "#/definitions/renderer"
                                 },
                                 "minItems": 1
-                            },
-                            "default_renderer": {
-                                "description": "Default renderer to use.",
-                                "type": "string"
                             }
                         }
                     }
@@ -135,6 +131,10 @@
                 "template": {
                     "description": "Renderer template file.",
                     "type": "string"
+                },
+                "default": {
+                    "description": "Mark this renderer as default.",
+                    "type": "boolean"
                 },
                 "args": {
                     "description": "Renderer extra keyword arguments.",

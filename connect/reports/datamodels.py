@@ -2,6 +2,7 @@
 
 import os
 from dataclasses import asdict, dataclass, field
+from functools import cached_property
 from typing import Any, Dict, List
 
 
@@ -25,6 +26,7 @@ class RendererDefinition:
     id: str
     type: str
     description: str
+    default: bool = False
     template: str = field(default=None)
     args: Dict[str, Any] = field(default=None)
 
@@ -51,9 +53,14 @@ class ReportDefinition:
     entrypoint: str
     audience: List[str]
     report_spec: str
-    default_renderer: str
     renderers: List[RendererDefinition]
     parameters: List[ParameterDefinition] = field(default_factory=list)
+
+    @cached_property
+    def default_renderer(self):
+        for renderer in self.renderers:
+            if renderer.default:
+                return renderer.id
 
     @property
     def local_id(self):

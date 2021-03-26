@@ -177,7 +177,7 @@ def test_reportv1_object_report_spec(repo_json, report_v1_json):
     ('field'),
     (
         'name', 'readme_file', 'entrypoint', 'audience',
-        'report_spec', 'renderers', 'default_renderer',
+        'report_spec', 'renderers',
     ),
 )
 def test_reportv2_object_required_fields(repo_json, report_v2_json, field):
@@ -192,7 +192,7 @@ def test_reportv2_object_required_fields(repo_json, report_v2_json, field):
 
 @pytest.mark.parametrize(
     ('field'),
-    ('name', 'readme_file', 'entrypoint', 'report_spec', 'default_renderer'),
+    ('name', 'readme_file', 'entrypoint', 'report_spec'),
 )
 def test_reportv2_object_string_fields(repo_json, report_v2_json, field):
     report = report_v2_json()

@@ -62,9 +62,9 @@ class XLSXRenderer(BaseRenderer):
                 vertical='top',
             )
         ws['A2'].value = 'Report Start time'
-        ws['B2'].value = start_time.isoformat()
+        ws['B2'].value = start_time.strftime('%Y-%m-%d %H:%M:%S')
         ws['A3'].value = 'Report Finish time'
-        ws['B3'].value = datetime.now(tz=pytz.utc).isoformat()
+        ws['B3'].value = datetime.now(tz=pytz.utc).strftime('%Y-%m-%d %H:%M:%S')
         ws['A4'].value = 'Account ID'
         ws['B4'].value = self.account.id
         ws['A5'].value = 'Account Name'
