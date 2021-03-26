@@ -47,15 +47,21 @@ def test_validate_css_not_found(mocker):
     ('url', 'expected_url'),
     (
         ('https://example.com/image.png', 'https://example.com/image.png'),
-        ('file://image.png', 'file:///root_dir/template_dir/image.png'),
         ('file:///root_dir/template_dir/image.png', 'file:///root_dir/template_dir/image.png'),
-        ('file://images/image.png', 'file:///root_dir/template_dir/images/image.png'),
+        (
+            'file:///tmp/my_temp_dir/template_dir/image.png',
+            'file:///root_dir/template_dir/image.png',
+        ),
+        (
+            'file:///root_dir/template_dir/template_dir/image.png',
+            'file:///root_dir/template_dir/image.png',
+        ),
     ),
 )
 def test_local_fetcher(mocker, url, expected_url):
     def_fetcher = mocker.patch('connect.reports.renderers.pdf.default_url_fetcher')
 
-    local_fetcher(url, root_dir='/root_dir', template_dir='template_dir')
+    local_fetcher(url, root_dir='/root_dir', template_dir='template_dir', cwd='/tmp/my_temp_dir')
 
     def_fetcher.assert_called_once_with(expected_url)
 
@@ -86,6 +92,40 @@ def test_generate_report(mocker, account_factory, report_factory, report_data):
     assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
 
     html.write_pdf.assert_called_once_with('report.pdf')
+
+
+def test_generate_report_external_css(mocker, account_factory, report_factory, report_data):
+    mocker.patch(
+        'connect.reports.renderers.pdf.Jinja2Renderer.generate_report',
+        return_value='report.pdf.html',
+    )
+    html = mocker.MagicMock()
+    mocked_html = mocker.patch('connect.reports.renderers.pdf.HTML', return_value=html)
+    css = mocker.MagicMock()
+    mocked_css = mocker.patch('connect.reports.renderers.pdf.CSS', return_value=css)
+    fetcher = mocker.MagicMock()
+    mocked_partial = mocker.patch('connect.reports.renderers.pdf.partial', return_value=fetcher)
+
+    renderer = PDFRenderer(
+        'runtime environment', 'root_dir',
+        account_factory(),
+        report_factory(),
+        template='report_dir/template.html.j2',
+        args={'css_file': 'report_dir/template.css'},
+    )
+    data = report_data()
+    assert renderer.generate_report(data, 'report.pdf') == 'report.pdf'
+
+    mocked_partial.assert_called_once_with(
+        local_fetcher, root_dir='root_dir', template_dir='report_dir', cwd=os.getcwd(),
+    )
+    assert mocked_html.mock_calls[0].kwargs['filename'] == 'report.pdf.html'
+    assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
+
+    assert mocked_css.mock_calls[0].kwargs['filename'] == 'root_dir/report_dir/template.css'
+    assert mocked_css.mock_calls[0].kwargs['url_fetcher'] == fetcher
+
+    html.write_pdf.assert_called_once_with('report.pdf', stylesheets=[css])
 
 
 def test_validate_tmpfs_template_wrong_name():

@@ -8,6 +8,7 @@ from fs.tempfs import TempFS
 
 from connect.reports.datamodels import (
     ParameterDefinition,
+    RendererDefinition,
     ReportDefinition,
     RepositoryDefinition,
 )
@@ -39,6 +40,14 @@ def test_report_definition_description(mocker, report_v2_json):
     defs = ReportDefinition(root_path='root_path', **report_json)
     assert defs.description == expected_descr
     assert mocked_open.mock_calls[0].args == (expected_readme_path, 'r')
+
+
+def test_report_definition_default_renderer(mocker, report_v2_json, renderer_json):
+    report_json = report_v2_json(
+        renderers=[RendererDefinition(root_path='root_path', **renderer_json())],
+    )
+    defs = ReportDefinition(root_path='root_path', **report_json)
+    assert defs.default_renderer == defs.renderers[0].id
 
 
 def test_report_get_parameters(mocker, report_v2_json, param_json):

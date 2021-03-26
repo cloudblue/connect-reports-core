@@ -31,13 +31,16 @@ def param_json():
 def renderer_json():
     def _renderer_data(
         id='renderer_id', type='xlsx',
-        description='XLSX renderer', template=None,
+        description='XLSX renderer',
+        default=True,
+        template=None,
         args=None,
     ):
         data = {
             'id': id,
             'type': type,
             'description': description,
+            'default': default,
         }
         if template is not None:
             data['template'] = template
@@ -59,7 +62,6 @@ def report_v2_json(param_json, renderer_json):
         audience=['vendor', 'provider'],  # noqa: B006
         parameters=[param_json()],  # noqa: B006
         renderers=[renderer_json()],  # noqa: B006
-        default_renderer='renderer_id',
     ):
 
         data = {
@@ -70,7 +72,6 @@ def report_v2_json(param_json, renderer_json):
             'parameters': parameters,
             'renderers': renderers,
             'report_spec': '2',
-            'default_renderer': default_renderer,
         }
 
         return data

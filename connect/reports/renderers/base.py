@@ -60,15 +60,11 @@ class BaseRenderer(metaclass=ABCMeta):
                 'report_id': self.report.id,
                 'report_name': self.report.name,
                 'runtime_environment': self.environment,
-                'report_execution_parameters': json.dumps(
-                    self.report.values,
-                    indent=4,
-                    sort_keys=True,
-                ),
+                'report_execution_parameters': self.report.values,
             },
         }
         output_file = f'{output_file}.json'
-        json.dump(data, open(output_file, 'w'))
+        json.dump(data, open(output_file, 'w'), indent=4, sort_keys=True)
         return output_file
 
     def pack_files(self, report_file, summary_file, output_file):

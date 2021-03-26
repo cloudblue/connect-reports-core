@@ -103,7 +103,10 @@ def _validate_report(report):
         )
 
     renderers_ids = []
+    default_renderers = []
     for renderer in report.renderers:
+        if renderer.default:
+            default_renderers.append(renderer.id)
         renderers_ids.append(renderer.id)
         errors.extend(_validate_renderer(report, renderer))
 
@@ -111,11 +114,12 @@ def _validate_report(report):
     if diff:
         errors.append(f'report {report.local_id} has duplicated renderer ids: {",".join(diff)}')
 
-    if report.default_renderer not in renderers_ids:
+    if len(default_renderers) > 1:
         errors.append(
-            f'default renderer for report {report.local_id} '
-            f'does not exist: {report.default_renderer}',
+            f'report {report.local_id} has multiple default renderers: '
+            f'{",".join(default_renderers)}',
         )
+
     return errors
 
 
