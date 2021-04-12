@@ -4,3 +4,5 @@
 
 CLI_ENV = 'CLI Tool'
 REPORTS_ENV = 'Connect Reports'
+
+DEFAULT_RENDERER_ID = 'default_xlsx_renderer'

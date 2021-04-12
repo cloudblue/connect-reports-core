@@ -7,6 +7,7 @@ from connect.reports.datamodels import (
     ReportDefinition,
     RepositoryDefinition,
 )
+from connect.reports.constants import DEFAULT_RENDERER_ID
 
 
 def parse(root_path, data):
@@ -19,7 +20,7 @@ def parse(root_path, data):
             parameters_definitions.append(cls(**param))
 
         if report['report_spec'] == '1':
-            default_renderer = 'default_xlsx_renderer'
+            default_renderer = DEFAULT_RENDERER_ID
             template = report.pop('template')
             start_row = report.pop('start_row')
             start_col = report.pop('start_col')
