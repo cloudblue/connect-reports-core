@@ -79,6 +79,12 @@ class ReportDefinition:
             for p in self.parameters
         ]
 
+    def get_renderers(self):
+        return [
+            asdict(renderer)
+            for renderer in self.renderers
+        ]
+
 
 @dataclass
 class RepositoryDefinition:
