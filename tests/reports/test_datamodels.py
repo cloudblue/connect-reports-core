@@ -59,6 +59,17 @@ def test_report_get_parameters(mocker, report_v2_json, param_json):
     assert defs.get_parameters() == [param]
 
 
+def test_report_get_renderers(mocker, report_v2_json, renderer_json):
+    report_json = report_v2_json()
+    renderer = RendererDefinition(root_path='root_path', **renderer_json())
+    report_json['renderers'] = [renderer]
+    defs = ReportDefinition(root_path='root_path', **report_json)
+
+    assert defs.get_renderers()[0]['id'] == renderer.id
+    assert defs.get_renderers()[0]['type'] == renderer.type
+    assert defs.get_renderers()[0]['description'] == renderer.description
+
+
 def test_repository_definition_description(mocker, repo_json):
     repo_data = repo_json()
 
