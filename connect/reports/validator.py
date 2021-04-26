@@ -52,13 +52,13 @@ def _validate_parameters(report_id, parameters):
     for param in parameters:
         params_ids.append(param.id)
 
-    if param.type not in ALL_PARAM_TYPES:
-        errors.append(
-            f'Invalid type for parameter `{param.id}` on report `{report_id}`: `{param.type}`.',
-        )
+        if param.type not in ALL_PARAM_TYPES:
+            errors.append(
+                f'Invalid type for parameter `{param.id}` on report `{report_id}`: `{param.type}`.',
+            )
 
-    if param.type in CHOICES_PARAM_TYPE and not param.choices:
-        errors.append(f'Missing choices for parameter `{param.id}` on report `{report_id}`.')
+        if param.type in CHOICES_PARAM_TYPE and not param.choices:
+            errors.append(f'Missing choices for parameter `{param.id}` on report `{report_id}`.')
 
     diff = set(_get_duplicates(params_ids))
     if diff:
