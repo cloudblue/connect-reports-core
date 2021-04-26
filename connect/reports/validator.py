@@ -46,31 +46,34 @@ def validate_with_schema(json_data):
         return str(errors)
 
 
-def _validate_parameters(parameters):
+def _validate_parameters(report_id, parameters):
     errors = []
     params_ids = []
     for param in parameters:
         params_ids.append(param.id)
 
     if param.type not in ALL_PARAM_TYPES:
-        errors.append(f'Invalid type for parameter {param.id}: {param.type}.')
+        errors.append(
+            f'Invalid type for parameter `{param.id}` on report `{report_id}`: `{param.type}`.',
+        )
 
     if param.type in CHOICES_PARAM_TYPE and not param.choices:
-        errors.append(f'Missing choices for parameter {param.id}.')
+        errors.append(f'Missing choices for parameter `{param.id}` on report `{report_id}`.')
 
     diff = set(_get_duplicates(params_ids))
     if diff:
         errors.append(
-            f'The following parameter ids are duplicated: {",".join(diff)}',
+            f'The following parameter ids are duplicated on report `{report_id}`: {",".join(diff)}',
         )
     return errors
 
 
-def _validate_renderer(report, renderer):
+def _validate_renderer(report_id, renderer):
+
     errors = []
     if renderer.type not in get_renderers():
         errors.append(
-            f'renderer `{renderer.id}` of type `{renderer.type}` is not known.',
+            f'renderer `{renderer.id}` of type `{renderer.type}` is not known on `{report_id}`.',
         )
         return errors
 
@@ -102,13 +105,15 @@ def _validate_report(report):
             'does not match the package definition.',
         )
 
+    errors.extend(_validate_parameters(report.local_id, report.parameters))
+
     renderers_ids = []
     default_renderers = []
     for renderer in report.renderers:
         if renderer.default:
             default_renderers.append(renderer.id)
         renderers_ids.append(renderer.id)
-        errors.extend(_validate_renderer(report, renderer))
+        errors.extend(_validate_renderer(report.local_id, renderer))
 
     diff = set(_get_duplicates(renderers_ids))
     if diff:
