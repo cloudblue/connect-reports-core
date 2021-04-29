@@ -80,10 +80,19 @@ class ReportDefinition:
         ]
 
     def get_renderers(self):
-        return [
-            asdict(renderer)
-            for renderer in self.renderers
-        ]
+        renderer_list = []
+        for renderer in self.renderers:
+            renderer_list.append(
+                {
+                    'id': renderer.id,
+                    'type': renderer.type,
+                    'description': renderer.description,
+                    'default': renderer.default,
+                    'template': renderer.template,
+                    'args': renderer.args,
+                },
+            )
+        return renderer_list
 
 
 @dataclass

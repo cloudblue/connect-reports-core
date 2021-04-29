@@ -59,17 +59,6 @@ def test_report_get_parameters(mocker, report_v2_json, param_json):
     assert defs.get_parameters() == [param]
 
 
-def test_report_get_renderers(mocker, report_v2_json, renderer_json):
-    report_json = report_v2_json()
-    renderer = RendererDefinition(root_path='root_path', **renderer_json())
-    report_json['renderers'] = [renderer]
-    defs = ReportDefinition(root_path='root_path', **report_json)
-
-    assert defs.get_renderers()[0]['id'] == renderer.id
-    assert defs.get_renderers()[0]['type'] == renderer.type
-    assert defs.get_renderers()[0]['description'] == renderer.description
-
-
 def test_repository_definition_description(mocker, repo_json):
     repo_data = repo_json()
 
@@ -106,3 +95,66 @@ def test_repository_tempfs_definition_description(repo_json):
     defs = RepositoryDefinition(root_path=tmp_fs.root_path, **repo_data)
 
     assert defs.description == expected_descr
+
+
+def test_report_get_renderers(mocker, report_v2_json, renderer_json):
+    report_json = report_v2_json()
+    renderer = RendererDefinition(root_path='root_path', **renderer_json())
+    report_json['renderers'] = [renderer]
+    defs = ReportDefinition(root_path='root_path', **report_json)
+
+    data = defs.get_renderers()
+
+    assert data[0]['id'] == renderer.id
+    assert data[0]['type'] == renderer.type
+    assert data[0]['description'] == renderer.description
+    assert 'root_path' not in data[0]
+
+
+def test_report_get_renderers_multiple(mocker, report_v2_json, renderer_json):
+    report_json = report_v2_json()
+    xls_renderer = RendererDefinition(
+        root_path='root_path',
+        **renderer_json(id='xlsx_renderer', default=False),
+    )
+    json_renderer = RendererDefinition(
+        root_path='root_path',
+        **renderer_json(
+            id='json_renderer',
+            type='json',
+            default=True,
+            description='Json renderer',
+        ),
+    )
+    csv_renderer = RendererDefinition(
+        root_path='root_path',
+        **renderer_json(
+            id='csv_renderer',
+            type='csv',
+            default=False,
+            description='Csv renderer',
+        ),
+    )
+    pdf_renderer = RendererDefinition(
+        root_path='root_path',
+        **renderer_json(
+            id='pdf_renderer',
+            type='pdf',
+            default=False,
+            description='Pdf renderer',
+            template='template.j2',
+            args={'key1': 'value1', 'key2': 'value2'},
+        ),
+    )
+    report_json['renderers'] = [xls_renderer, json_renderer, csv_renderer, pdf_renderer]
+    defs = ReportDefinition(root_path='root_path', **report_json)
+
+    data = defs.get_renderers()
+
+    assert isinstance(data, list)
+    assert len(data) == 4
+    assert data[0]['id'] == 'xlsx_renderer'
+
+    for renderer in data:
+        if renderer['default']:
+            assert renderer['id'] == 'json_renderer'
