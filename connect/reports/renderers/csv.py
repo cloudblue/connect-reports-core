@@ -8,6 +8,12 @@ import csv
 
 @register('csv')
 class CSVRenderer(BaseRenderer):
+    """
+    CSV Renderer class.
+    Inherits from BaseRenderer class and implements
+    the generation report function, exporting the data
+    to a CSV file.
+    """
     def generate_report(self, data, output_file):
         tokens = output_file.split('.')
         if tokens[-1] != 'csv':

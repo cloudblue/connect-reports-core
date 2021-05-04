@@ -14,6 +14,12 @@ from connect.reports.renderers.registry import register
 
 @register('jinja2')
 class Jinja2Renderer(BaseRenderer):
+    """
+    Jinja2 Renderer class.
+    Inherits from BaseRenderer class and implements
+    the generation report function, exporting the data
+    to a j2 file.
+    """
     def generate_report(self, data, output_file):
         path, name = self.template.rsplit('/', 1)
         loader = FileSystemLoader(os.path.join(self.root_dir, path))

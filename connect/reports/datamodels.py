@@ -22,6 +22,24 @@ class Report:
 
 @dataclass
 class RendererDefinition:
+    """
+    Renderer representation on `reports.json` file descriptor.
+
+    :param root_path: Base root path.
+    :type root_path: str
+    :param id: Unique renderer identifier.
+    :type id: str
+    :param type: Renderer type.
+    :type type: str
+    :param description: Brief explanation about renderer.
+    :type description: str
+    :param default: Active/Inactive renderer.
+    :type default: bool
+    :param template: Template name
+    :type template: str
+    :param args: Additional arguments for using the renderer.
+    :type args: dict
+    """
     root_path: str
     id: str
     type: str
@@ -33,6 +51,20 @@ class RendererDefinition:
 
 @dataclass
 class ParameterDefinition:
+    """
+    Parameter representation on `reports.json` file descriptor.
+
+    :param id: Unique parameter identifier.
+    :type id: str
+    :param type: Parameter type.
+    :type type: str
+    :param name: Parameter name.
+    :type name: str
+    :param description: Brief explanation about parameter.
+    :type description: str
+    :param required: Required parameter.
+    :type required: bool
+    """
     id: str
     type: str
     name: str
@@ -47,6 +79,26 @@ class ChoicesParameterDefinition(ParameterDefinition):
 
 @dataclass
 class ReportDefinition:
+    """
+    Report representation on `reports.json` file descriptor.
+
+    :param root_path: Base root path.
+    :type root_path: str
+    :param name: Report name.
+    :type name: str
+    :param readme_file: Brief explanation about report.
+    :type readme_file: str
+    :param entrypoint: Function responsible to generate the report.
+    :type entrypoint: str
+    :param audience: Report audience.
+    :type audience: list
+    :param report_spec: Report specification.
+    :type report_spec: str
+    :param renderers: List of available renderers for report.
+    :type renderers: list
+    :param parameters: List of report parameters.
+    :type parameters: list
+    """
     root_path: str
     name: str
     readme_file: str
@@ -97,6 +149,22 @@ class ReportDefinition:
 
 @dataclass
 class RepositoryDefinition:
+    """
+    Report repository representation on `reports.json` file descriptor.
+
+    :param root_path: Base root path.
+    :type root_path: str
+    :param readme_file: Brief explanation about report repository.
+    :type readme_file: str
+    :param name: Repository name.
+    :type name: str
+    :param version: Repository version.
+    :type version: str
+    :param language: Supported language for report generation.
+    :type language: str
+    :param reports: List of available reports.
+    :type reports: list
+    """
     root_path: str
     readme_file: str
     name: str
