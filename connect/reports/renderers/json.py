@@ -12,5 +12,5 @@ class JSONRenderer(BaseRenderer):
         tokens = output_file.split('.')
         if tokens[-1] != 'json':
             output_file = f'{tokens[0]}.json'
-        json.dump(data, open(output_file, 'w'))
+        json.dump(list(data), open(output_file, 'w'))
         return output_file
