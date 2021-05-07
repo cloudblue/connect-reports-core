@@ -30,6 +30,12 @@ def local_fetcher(url, root_dir=None, template_dir=None, cwd=None):
 
 @register('pdf')
 class PDFRenderer(Jinja2Renderer):
+    """
+    PDF Renderer class.
+    Inherits from BaseRenderer class and implements
+    the generation report function, exporting the data
+    to a PDF file.
+    """
     def render(self, data, output_file, start_time=None):
         start_time = start_time or datetime.now(tz=pytz.utc)
         with tempfile.TemporaryDirectory() as tmpdir:

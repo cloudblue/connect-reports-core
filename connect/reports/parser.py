@@ -11,6 +11,16 @@ from connect.reports.constants import DEFAULT_RENDERER_ID
 
 
 def parse(root_path, data):
+    """
+    Creates and returns a RepositoryDefinition object.
+
+    :param root_path: Reports descriptor root path.
+    :type root_path: str
+    :param data: Reports descriptor content.
+    :type data: dict
+    :returns: A repository definition object.
+    :rtype: RepositoryDefinition
+    """
     reports = data.pop('reports')
     reports_definitions = []
     for report in reports:

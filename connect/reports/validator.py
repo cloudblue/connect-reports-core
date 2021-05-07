@@ -38,6 +38,14 @@ def _get_duplicates(data):
 
 
 def validate_with_schema(json_data):
+    """
+    Validates reports descriptor content against json schema.
+
+    :param json_data: Reports descriptor string content.
+    :type json_data: dict
+    :returns: A string list of errors if exist.
+    :rtype: str
+    """
     with open(JSON_REPORTS_SCHEMA, 'r') as fp:
         json_schema = json.load(fp)
     try:
@@ -47,6 +55,16 @@ def validate_with_schema(json_data):
 
 
 def _validate_parameters(report_id, parameters):
+    """
+    Validates report parameters.
+
+    :param report_id: Report unique identifier.
+    :type report_id: str
+    :param parameters: List of report parameters.
+    :type parameters: list
+    :returns: A list of errors.
+    :rtype: list
+    """
     errors = []
     params_ids = []
     for param in parameters:
@@ -69,7 +87,16 @@ def _validate_parameters(report_id, parameters):
 
 
 def _validate_renderer(report_id, renderer):
+    """
+    Validates renderer.
 
+    :param report_id: Report unique identifier.
+    :type report_id: str
+    :param renderer: Renderer definition object.
+    :type renderer: RendererDefinition
+    :returns: A list of errors.
+    :rtype: list
+    """
     errors = []
     if renderer.type not in get_renderers():
         errors.append(
@@ -83,6 +110,14 @@ def _validate_renderer(report_id, renderer):
 
 
 def _validate_report(report):
+    """
+    Validates report.
+
+    :param report: Report definition object.
+    :type report: ReportDefinition
+    :returns: A list of errors.
+    :rtype: list
+    """
     errors = []
     if not os.path.isfile(
         os.path.join(report.root_path, report.readme_file),
@@ -129,6 +164,14 @@ def _validate_report(report):
 
 
 def validate(repo):
+    """
+    Validates whole repository definition.
+
+    :param repo: Repository definition object.
+    :type repo: RepositoryDefinition
+    :returns: A list of errors.
+    :rtype: list
+    """
     errors = []
     if not os.path.isfile(
         os.path.join(repo.root_path, repo.readme_file),

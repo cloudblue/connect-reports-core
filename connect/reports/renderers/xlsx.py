@@ -19,6 +19,12 @@ from connect.reports.renderers.registry import register
 
 @register('xlsx')
 class XLSXRenderer(BaseRenderer):
+    """
+    XLSX Renderer class.
+    Inherits from BaseRenderer class and implements
+    the generation report function, exporting the data
+    to a Excel file.
+    """
     def render(self, data, output_file, start_time=None):
         self.start_time = start_time or datetime.now(tz=pytz.utc)
         return self.generate_report(data, output_file)

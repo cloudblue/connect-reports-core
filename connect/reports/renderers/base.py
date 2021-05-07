@@ -11,6 +11,26 @@ import pytz
 
 
 class BaseRenderer(metaclass=ABCMeta):
+    """
+    Base renderer class with minimum required functionality
+    that renderers have to inherit and implement.
+
+    :param environment: Runtime environment.
+    :type environment: str
+    :param root_dir: Base root dir.
+    :type root_dir: str
+    :param account: Owner account.
+    :type account: Account
+    :param report: Report object.
+    :type report: Report
+    :param template: Template name.
+    :type template: str
+    :param args: Renderer required arguments.
+    :type args: dict
+    :param extra_context: Additional context data
+                        for report rendering.
+    :type extra_context: dict
+    """
     def __init__(
         self,
         environment,
@@ -42,6 +62,16 @@ class BaseRenderer(metaclass=ABCMeta):
         self.extra_context = data
 
     def render(self, data, output_file, start_time=None):
+        """
+        Creates effectively report pack file (report + summary files)
+
+        :param data: Report information.
+        :type data: dict
+        :param output_file: Output file name.
+        :type output_file: str
+        :param start_time: Start time information.
+        :type start_time: datetime
+        """
         start_time = start_time or datetime.now(tz=pytz.utc)
         with tempfile.TemporaryDirectory() as tmpdir:
             report_file = self.generate_report(data, f'{tmpdir}/report')
@@ -50,6 +80,14 @@ class BaseRenderer(metaclass=ABCMeta):
         return pack_file
 
     def generate_summary(self, output_file, start_time):
+        """
+        Generates summary information of report generation.
+
+        :param output_file: Output file name.
+        :type output_file: str
+        :param start_time: Start time information.
+        :type start_time: datetime
+        """
         data = {
             'title': 'Report Execution Information',
             'data': {
@@ -79,6 +117,15 @@ class BaseRenderer(metaclass=ABCMeta):
 
     @abstractmethod
     def generate_report(self, data, output_file):
+        """
+        Method to be implemented by the specific renderer.
+        Generates report file.
+
+        :param data: Report information.
+        :type data: dict
+        :param output_file: Output file name.
+        :type output_file: str
+        """
         raise NotImplementedError('Subclasses must implement the `generate_report` method.')
 
     @classmethod
