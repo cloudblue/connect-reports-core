@@ -56,3 +56,38 @@ def test_render(account_factory, report_factory, report_data):
         assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
         with repzip.open('report.json') as repfile:
             assert repfile.read().decode('utf-8') == json.dumps(data)
+
+
+def test_generate_report_dict(account_factory, report_factory):
+    tmp_fs = TempFS()
+    data = {'key': 'value'}
+    renderer = JSONRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+    )
+    output_file = renderer.render(data, f'{tmp_fs.root_path}/report')
+    assert output_file == f'{tmp_fs.root_path}/report.zip'
+    with ZipFile(output_file) as repzip:
+        assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
+        with repzip.open('report.json') as repfile:
+            assert repfile.read().decode('utf-8') == json.dumps(data)
+
+
+def test_generate_report_generator(account_factory, report_factory):
+    tmp_fs = TempFS()
+    data = ({'key': 'value'} for _ in range(10))
+    renderer = JSONRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+    )
+    output_file = renderer.render(data, f'{tmp_fs.root_path}/report')
+    assert output_file == f'{tmp_fs.root_path}/report.zip'
+    data = ({'key': 'value'} for _ in range(10))
+    with ZipFile(output_file) as repzip:
+        assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
+        with repzip.open('report.json') as repfile:
+            assert repfile.read().decode('utf-8') == json.dumps(list(data))
