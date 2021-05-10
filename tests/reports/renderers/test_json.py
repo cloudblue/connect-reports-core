@@ -91,3 +91,25 @@ def test_generate_report_generator(account_factory, report_factory):
         assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
         with repzip.open('report.json') as repfile:
             assert repfile.read().decode('utf-8') == json.dumps(list(data))
+
+
+def test_generate_report_generator_no_data(account_factory, report_factory):
+    tmp_fs = TempFS()
+
+    def fakegen():
+        if False:
+            yield
+    data = fakegen()
+    renderer = JSONRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+    )
+    output_file = renderer.render(data, f'{tmp_fs.root_path}/report')
+    assert output_file == f'{tmp_fs.root_path}/report.zip'
+    data = ({'key': 'value'} for _ in range(10))
+    with ZipFile(output_file) as repzip:
+        assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
+        with repzip.open('report.json') as repfile:
+            assert repfile.read().decode('utf-8') == json.dumps([])
