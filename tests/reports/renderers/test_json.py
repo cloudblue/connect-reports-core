@@ -1,13 +1,13 @@
 #  Copyright © 2021 CloudBlue. All rights reserved.
+from datetime import date, datetime, time
+from zipfile import ZipFile
 
-from connect.reports.datamodels import RendererDefinition
-from connect.reports.renderers import JSONRenderer
+import orjson
 
 from fs.tempfs import TempFS
 
-from datetime import datetime
-from zipfile import ZipFile
-import json
+from connect.reports.datamodels import RendererDefinition
+from connect.reports.renderers import JSONRenderer
 
 
 def test_validate_ok():
@@ -55,12 +55,19 @@ def test_render(account_factory, report_factory, report_data):
     with ZipFile(output_file) as repzip:
         assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
         with repzip.open('report.json') as repfile:
-            assert repfile.read().decode('utf-8') == json.dumps(data)
+            assert repfile.read().decode('utf-8') == orjson.dumps(data).decode('utf-8')
 
 
 def test_generate_report_dict(account_factory, report_factory):
     tmp_fs = TempFS()
-    data = {'key': 'value'}
+    data = {
+        'key': 'value',
+        'int': 3,
+        'float': 3.4,
+        'datetime': datetime.now(),
+        'date': date.today(),
+        'time': time(12, 11, 10),
+    }
     renderer = JSONRenderer(
         'runtime',
         tmp_fs.root_path,
@@ -72,7 +79,7 @@ def test_generate_report_dict(account_factory, report_factory):
     with ZipFile(output_file) as repzip:
         assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
         with repzip.open('report.json') as repfile:
-            assert repfile.read().decode('utf-8') == json.dumps(data)
+            assert repfile.read().decode('utf-8') == orjson.dumps(data).decode('utf-8')
 
 
 def test_generate_report_generator(account_factory, report_factory):
@@ -90,7 +97,7 @@ def test_generate_report_generator(account_factory, report_factory):
     with ZipFile(output_file) as repzip:
         assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
         with repzip.open('report.json') as repfile:
-            assert repfile.read().decode('utf-8') == json.dumps(list(data))
+            assert repfile.read().decode('utf-8') == orjson.dumps(list(data)).decode('utf-8')
 
 
 def test_generate_report_generator_no_data(account_factory, report_factory):
@@ -112,4 +119,4 @@ def test_generate_report_generator_no_data(account_factory, report_factory):
     with ZipFile(output_file) as repzip:
         assert sorted(repzip.namelist()) == ['report.json', 'summary.json']
         with repzip.open('report.json') as repfile:
-            assert repfile.read().decode('utf-8') == json.dumps([])
+            assert repfile.read().decode('utf-8') == orjson.dumps([]).decode('utf-8')

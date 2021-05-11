@@ -1,8 +1,9 @@
 #  Copyright © 2021 CloudBlue. All rights reserved.
 
 import inspect
-import json
 import os
+
+import orjson
 
 from connect.reports.renderers.base import BaseRenderer
 from connect.reports.renderers.registry import register
@@ -22,17 +23,19 @@ class JSONRenderer(BaseRenderer):
             output_file = f'{tokens[0]}.json'
         if inspect.isgenerator(data):
             has_data = False
-            with open(output_file, 'w') as f:
-                f.write('[')
+            with open(output_file, 'wb') as f:
+                f.write(b'[')
                 for item in data:
                     has_data = True
-                    f.write(f'{json.dumps(item)}, ')
+                    f.write(orjson.dumps(item))
+                    f.write(b',')
             if has_data:
                 with open(output_file, 'rb+') as f:
-                    f.seek(-2, os.SEEK_END)
+                    f.seek(-1, os.SEEK_END)
                     f.truncate()
             with open(output_file, 'a') as f:
                 f.write(']')
         else:
-            json.dump(data, open(output_file, 'w'))
+            with open(output_file, 'wb') as f:
+                f.write(orjson.dumps(data))
         return output_file

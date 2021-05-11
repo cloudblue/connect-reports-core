@@ -29,6 +29,7 @@ Jinja2 = "^2.11.3"
 jsonschema = "^3.2.0"
 pytz = "^2021.1"
 lxml = "^4.6.2"
+orjson = "^3.5.2"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.21.0"
