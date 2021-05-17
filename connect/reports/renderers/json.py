@@ -1,7 +1,6 @@
 #  Copyright © 2021 CloudBlue. All rights reserved.
 
 import inspect
-import os
 
 import orjson
 
@@ -22,19 +21,15 @@ class JSONRenderer(BaseRenderer):
         if tokens[-1] != 'json':
             output_file = f'{tokens[0]}.json'
         if inspect.isgenerator(data):
-            has_data = False
+            sep = b''
             with open(output_file, 'wb') as f:
                 f.write(b'[')
                 for item in data:
-                    has_data = True
+                    f.write(sep)
                     f.write(orjson.dumps(item))
-                    f.write(b',')
-            if has_data:
-                with open(output_file, 'rb+') as f:
-                    f.seek(-1, os.SEEK_END)
-                    f.truncate()
-            with open(output_file, 'a') as f:
-                f.write(']')
+                    if sep == b'':
+                        sep = b','
+                f.write(b']')
         else:
             with open(output_file, 'wb') as f:
                 f.write(orjson.dumps(data))
