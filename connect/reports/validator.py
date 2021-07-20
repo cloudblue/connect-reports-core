@@ -147,8 +147,8 @@ def _validate_report(report):
     for renderer in report.renderers:
         if renderer.default:
             default_renderers.append(renderer.id)
+            errors.extend(_validate_renderer(report.local_id, renderer))
         renderers_ids.append(renderer.id)
-        errors.extend(_validate_renderer(report.local_id, renderer))
 
     diff = set(_get_duplicates(renderers_ids))
     if diff:
