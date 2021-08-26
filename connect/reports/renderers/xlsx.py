@@ -29,6 +29,15 @@ class XLSXRenderer(BaseRenderer):
         self.start_time = start_time or datetime.now(tz=pytz.utc)
         return self.generate_report(data, output_file)
 
+    def get_cell_content(self, data):
+        """
+        Generates the content of the cell. It accepts a collection between 1 and 2 elements. If
+         it is 1, it is just the data, if it is 2, the second element contains the cell named style.
+        """
+        if type(data) in (tuple, dict, list) and len(data) == 2 and data[1]:
+            return {'value': data[0], 'style': data[1]}
+        return {'value': data}
+
     def generate_report(self, data, output_file):
         start_col_idx = self.args.get('start_col', 1)
         row_idx = self.args.get('start_row', 2)
@@ -41,7 +50,8 @@ class XLSXRenderer(BaseRenderer):
         ws = wb['Data']
         for row in data:
             for col_idx, cell_value in enumerate(row, start=start_col_idx):
-                ws.cell(row_idx, col_idx, value=cell_value)
+                content = self.get_cell_content(cell_value)
+                ws.cell(row_idx, col_idx, **content)
             row_idx += 1
 
         self._add_info_sheet(wb.create_sheet('Info'), self.start_time)
