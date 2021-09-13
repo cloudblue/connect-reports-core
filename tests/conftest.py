@@ -2,9 +2,6 @@
 
 import pytest
 
-from openpyxl.styles import Alignment, Font, NamedStyle
-from openpyxl.styles.colors import BLUE
-
 from connect.reports.datamodels import Account, Report
 
 
@@ -165,29 +162,6 @@ def report_data():
             [f'row_{i}_col_{j}' for j in range(cols)]
             for i in range(rows)
         ]
-    return _data
-
-
-TEST_STYLE = NamedStyle(
-    name="header",
-    font=Font(bold=True, color=BLUE),
-    alignment=Alignment(horizontal="center", vertical="center"),
-)
-
-
-@pytest.fixture
-def report_data_with_styles():
-    def _data(rows=10, cols=10, style_cells=None):
-        content = []
-        for i in range(rows):
-            row = []
-            for j in range(cols):
-                if not style_cells or (i, j) in style_cells:
-                    row.append((f'row_{i}_col_{j}', TEST_STYLE))
-                else:
-                    row.append(f'row_{i}_col_{j}')
-            content.append(row)
-        return content
     return _data
 
 

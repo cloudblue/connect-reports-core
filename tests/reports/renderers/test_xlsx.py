@@ -11,8 +11,6 @@ from openpyxl import Workbook, load_workbook
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import XLSXRenderer
 
-from tests.conftest import TEST_STYLE
-
 
 @pytest.mark.parametrize('args', (None, {}, {'start_row': 1, 'start_col': 1}))
 def test_validate_ok(mocker, args):
@@ -87,54 +85,6 @@ def test_generate_report(mocker, account_factory, report_factory, report_data):
     for i in range(10):
         for j in range(10):
             expected_calls.append(mocker.call(2 + i, 1 + j, value=f'row_{i}_col_{j}'))
-
-    data_sheet = mocker.MagicMock()
-
-    wbmock = mocker.MagicMock()
-    wbmock.__getitem__.side_effect = [data_sheet]
-
-    mocked_load_wb = mocker.patch(
-        'connect.reports.renderers.xlsx.load_workbook',
-        return_value=wbmock,
-    )
-    acc = account_factory()
-    report = report_factory()
-
-    renderer = XLSXRenderer(
-        'runtime environment', 'root_path', acc, report, template='template.xlsx',
-    )
-
-    renderer.generate_summary = mocker.MagicMock()
-    renderer.start_time = datetime.utcnow()
-
-    assert renderer.generate_report(data, 'report') == 'report.xlsx'
-    mocked_load_wb.assert_called_once_with('root_path/template.xlsx')
-    data_sheet.cell.assert_has_calls(expected_calls)
-    wbmock.save.assert_called_once_with('report.xlsx')
-
-
-def test_generate_report_with_style(
-    mocker,
-    account_factory,
-    report_factory,
-    report_data_with_styles,
-):
-    style_cells = [(2, 2), (2, 5), (4, 4), (6, 6), (7, 7)]
-    data = report_data_with_styles(style_cells=style_cells)
-
-    expected_calls = []
-    for i in range(10):
-        for j in range(10):
-            kwargs = {'value': f'row_{i}_col_{j}'}
-            if (i, j) in style_cells:
-                kwargs['style'] = TEST_STYLE
-            expected_calls.append(
-                mocker.call(
-                    2 + i,
-                    1 + j,
-                    **kwargs,
-                ),
-            )
 
     data_sheet = mocker.MagicMock()
 
