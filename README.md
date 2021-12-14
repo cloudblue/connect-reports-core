@@ -13,11 +13,11 @@ This library is reponsible for validation of reports definition, choosing of ren
 `Connect Reports Core` requires python 3.8 or later and has the following dependencies:
 
 * openpyxl>=2.5.14
-* WeasyPrint>=52.2
+* WeasyPrint>=53.4
 * Jinja2>=2.11.3
 * jsonschema<=3.2.0
 * pytz>=2021.1
-* lxml>=4.6.2
+* lxml>=4.7.1
 
 `Connect Reports Core` can be installed from [pypi.org](https://pypi.org/project/connect-reports-core/) using pip:
 

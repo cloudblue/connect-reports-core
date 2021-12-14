@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connect-reports-core"
-version = "0.1.0"
+version = "24.1.0"
 description = "Connect Reports Core"
 authors = ["CloudBlue LLC"]
 license = "Apache-2.0"
@@ -24,11 +24,11 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 openpyxl = ">=2.5.14"
-WeasyPrint = "^52.2"
+WeasyPrint = "^53.4"
 Jinja2 = ">=2,<4"
 jsonschema = "^3.2.0"
 pytz = "^2021.1"
-lxml = "^4.6.2"
+lxml = ">=4.7.1"
 orjson = "^3.5.2"
 plotly = "^5.3.0"
 kaleido = "0.2.1"
