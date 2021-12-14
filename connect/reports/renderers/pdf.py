@@ -1,7 +1,6 @@
 #  Copyright © 2021 CloudBlue. All rights reserved.
 
 import os
-import tempfile
 from datetime import datetime
 from functools import partial
 
@@ -9,6 +8,7 @@ import pytz
 
 from weasyprint import CSS, HTML, default_url_fetcher
 
+from connect.reports.renderers.base import temp_dir
 from connect.reports.renderers.j2 import Jinja2Renderer
 from connect.reports.renderers.registry import register
 
@@ -38,7 +38,7 @@ class PDFRenderer(Jinja2Renderer):
     """
     def render(self, data, output_file, start_time=None):
         start_time = start_time or datetime.now(tz=pytz.utc)
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with temp_dir() as tmpdir:
             self.cwd = tmpdir
             report_file = self.generate_report(data, f'{tmpdir}/report')
             summary_file = self.generate_summary(f'{tmpdir}/summary', start_time)
