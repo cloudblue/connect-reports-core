@@ -1,13 +1,25 @@
 #  Copyright © 2021 CloudBlue. All rights reserved.
-
-from abc import ABCMeta, abstractmethod
-import zipfile
-import os
-from datetime import datetime
-import tempfile
+import contextlib
 import json
+import os
+import shutil
+import tempfile
+import zipfile
+from abc import ABCMeta, abstractmethod
+from datetime import datetime
 
 import pytz
+
+
+@contextlib.contextmanager
+def temp_dir():
+    name = tempfile.mkdtemp()
+    yield name
+    try:
+        if os.path.isdir(name):
+            shutil.rmtree(name)
+    except Exception:
+        pass
 
 
 class BaseRenderer(metaclass=ABCMeta):
@@ -73,7 +85,7 @@ class BaseRenderer(metaclass=ABCMeta):
         :type start_time: datetime
         """
         start_time = start_time or datetime.now(tz=pytz.utc)
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with temp_dir() as tmpdir:
             report_file = self.generate_report(data, f'{tmpdir}/report')
             summary_file = self.generate_summary(f'{tmpdir}/summary', start_time)
             pack_file = self.pack_files(report_file, summary_file, output_file)
