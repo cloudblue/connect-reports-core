@@ -1,5 +1,5 @@
 #  Copyright © 2021 CloudBlue. All rights reserved.
-
+import pathlib
 import os
 from datetime import datetime
 from functools import partial
@@ -14,6 +14,8 @@ from connect.reports.renderers.registry import register
 
 
 def local_fetcher(url, root_dir=None, template_dir=None, cwd=None):
+    tpl_dir_path = pathlib.Path(os.path.abspath(root_dir)) / pathlib.Path(template_dir)
+    tpl_dir_url = tpl_dir_path.as_uri()
     if url.startswith(f'file://{cwd}'):
         rel_path = os.path.relpath(url[7:], cwd)
         new_path = os.path.join(
@@ -21,7 +23,7 @@ def local_fetcher(url, root_dir=None, template_dir=None, cwd=None):
             rel_path,
         )
         url = f'file://{new_path}'
-    elif url.startswith(f'file://{os.path.abspath(os.path.join(root_dir, template_dir))}'):
+    elif url.startswith(tpl_dir_url):
         count = url.count(template_dir)
         if url.count(template_dir) > 1:
             url = url.replace(f'{template_dir}/', '', count - 1)
