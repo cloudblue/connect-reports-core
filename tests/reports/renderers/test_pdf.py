@@ -66,6 +66,16 @@ def test_local_fetcher(mocker, url, expected_url):
     def_fetcher.assert_called_once_with(expected_url)
 
 
+def test_local_fetcher_root_with_spaces(mocker):
+    url = 'file:///root%20dir/template_dir/template_dir/image.png'
+    expected_url = 'file:///root%20dir/template_dir/image.png'
+    def_fetcher = mocker.patch('connect.reports.renderers.pdf.default_url_fetcher')
+
+    local_fetcher(url, root_dir='/root dir', template_dir='template_dir', cwd='/tmp/my_temp_dir')
+
+    def_fetcher.assert_called_once_with(expected_url)
+
+
 def test_generate_report(mocker, account_factory, report_factory, report_data):
     mocker.patch(
         'connect.reports.renderers.pdf.Jinja2Renderer.generate_report',
