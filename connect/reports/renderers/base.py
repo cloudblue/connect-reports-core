@@ -121,7 +121,7 @@ class BaseRenderer(metaclass=ABCMeta):
         tokens = output_file.split('.')
         if tokens[-1] != 'zip':
             output_file = f'{tokens[0]}.zip'
-        with zipfile.ZipFile(output_file, 'w') as repzip:
+        with zipfile.ZipFile(output_file, 'w', compression=zipfile.ZIP_DEFLATED) as repzip:
             repzip.write(report_file, os.path.basename(report_file))
             repzip.write(summary_file, os.path.basename(summary_file))
 
