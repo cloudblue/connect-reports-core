@@ -1,4 +1,4 @@
-#  Copyright © 2021 CloudBlue. All rights reserved.
+#  Copyright © 2022 CloudBlue. All rights reserved.
 
 from datetime import datetime
 
@@ -152,6 +152,84 @@ def test_render_tmpfs_ok(account_factory, report_factory, report_data):
     path_to_output = f'{tmp_fs.root_path}/package/report/report'
     output_file = renderer.render(data, path_to_output, start_time=datetime.now())
 
+    wb = load_workbook(output_file)
+    ws = wb['Data']
+
+    assert output_file == f'{path_to_output}.xlsx'
+    assert data == [[ws[f'A{item}'].value, ws[f'B{item}'].value] for item in range(2, 4)]
+
+
+@pytest.mark.asyncio
+async def test_render_async_tmpfs_ok(account_factory, report_factory, report_data):
+    tmp_fs = TempFS()
+    tmp_fs.makedirs('package/report')
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Data'
+    ws.cell(1, 1, value='Name')
+    ws.cell(1, 2, value='Description')
+    wb.save(f'{tmp_fs.root_path}/package/report/template.xlsx')
+
+    renderer = XLSXRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+        template='package/report/template.xlsx',
+    )
+
+    data = report_data(2, 2)
+
+    async def async_gen(cols, rows):
+        for element in report_data(cols, rows):
+            yield element
+
+    path_to_output = f'{tmp_fs.root_path}/package/report/report'
+    output_file = await renderer.render_async(
+        async_gen(2, 2),
+        path_to_output,
+        start_time=datetime.now(),
+    )
+    wb = load_workbook(output_file)
+    ws = wb['Data']
+
+    assert output_file == f'{path_to_output}.xlsx'
+    assert data == [[ws[f'A{item}'].value, ws[f'B{item}'].value] for item in range(2, 4)]
+
+
+@pytest.mark.asyncio
+async def test_render_async_with_sync_data(account_factory, report_factory, report_data):
+    tmp_fs = TempFS()
+    tmp_fs.makedirs('package/report')
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Data'
+    ws.cell(1, 1, value='Name')
+    ws.cell(1, 2, value='Description')
+    wb.save(f'{tmp_fs.root_path}/package/report/template.xlsx')
+
+    renderer = XLSXRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+        template='package/report/template.xlsx',
+    )
+
+    data = report_data(2, 2)
+
+    def sync_gen(cols, rows):
+        for element in report_data(cols, rows):
+            yield element
+
+    path_to_output = f'{tmp_fs.root_path}/package/report/report'
+    output_file = await renderer.render_async(
+        sync_gen(2, 2),
+        path_to_output,
+        start_time=datetime.now(),
+    )
     wb = load_workbook(output_file)
     ws = wb['Data']
 

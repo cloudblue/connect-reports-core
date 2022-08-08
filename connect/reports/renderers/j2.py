@@ -1,4 +1,4 @@
-#  Copyright © 2021 CloudBlue. All rights reserved.
+#  Copyright © 2022 CloudBlue. All rights reserved.
 
 import os
 
@@ -32,6 +32,24 @@ class Jinja2Renderer(BaseRenderer):
 
         report_file = f'{output_file}.{ext}'
         template.stream(self.get_context(data)).dump(open(report_file, 'w'))
+        return report_file
+
+    async def generate_report_async(self, data, output_file):
+        path, name = self.template.rsplit('/', 1)
+        loader = FileSystemLoader(os.path.join(self.root_dir, path))
+        env = Environment(
+            loader=loader,
+            autoescape=select_autoescape(['html', 'xml']),
+            enable_async=True,
+        )
+        template = env.get_template(name)
+        _, ext, _ = name.rsplit('.', 2)
+
+        report_file = f'{output_file}.{ext}'
+        with open(report_file, 'w') as writer:
+            async for line in template.generate_async(self.get_context(data)):
+                await self._to_thread(writer.write, line)
+
         return report_file
 
     @classmethod

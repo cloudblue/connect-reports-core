@@ -1,5 +1,6 @@
-#  Copyright © 2021 CloudBlue. All rights reserved.
+#  Copyright © 2022 CloudBlue. All rights reserved.
 
+import inspect
 import json
 import os
 from datetime import datetime
@@ -15,6 +16,7 @@ from zipfile import BadZipfile
 
 from connect.reports.renderers.base import BaseRenderer
 from connect.reports.renderers.registry import register
+from connect.reports.renderers.utils import aiter
 
 
 @register('xlsx')
@@ -28,6 +30,10 @@ class XLSXRenderer(BaseRenderer):
     def render(self, data, output_file, start_time=None):
         self.start_time = start_time or datetime.now(tz=pytz.utc)
         return self.generate_report(data, output_file)
+
+    async def render_async(self, data, output_file, start_time=None):
+        self.start_time = start_time or datetime.now(tz=pytz.utc)
+        return await self.generate_report_async(data, output_file)
 
     def generate_report(self, data, output_file):
         start_col_idx = self.args.get('start_col', 1)
@@ -48,6 +54,30 @@ class XLSXRenderer(BaseRenderer):
 
         output_file = f'{output_file}.xlsx'
         wb.save(output_file)
+        return output_file
+
+    async def generate_report_async(self, data, output_file):
+        start_col_idx = self.args.get('start_col', 1)
+        row_idx = self.args.get('start_row', 2)
+        wb = await self._to_thread(
+            load_workbook,
+            os.path.join(
+                self.root_dir,
+                self.template,
+            ),
+        )
+        ws = wb['Data']
+        if not inspect.isasyncgen(data):
+            data = aiter(data)
+        async for row in data:
+            for col_idx, cell_value in enumerate(row, start=start_col_idx):
+                ws.cell(row_idx, col_idx, value=cell_value)
+            row_idx += 1
+
+        self._add_info_sheet(wb.create_sheet('Info'), self.start_time)
+
+        output_file = f'{output_file}.xlsx'
+        await self._to_thread(wb.save, output_file)
         return output_file
 
     def _add_info_sheet(self, ws, start_time):

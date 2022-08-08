@@ -1,4 +1,4 @@
-#  Copyright © 2021 CloudBlue. All rights reserved.
+#  Copyright © 2022 CloudBlue. All rights reserved.
 
 import pytest
 
@@ -57,7 +57,11 @@ def test_get_renderer_class_not_found(registry):
 def test_get_renderer(registry, account_factory, report_factory):
     @register('test')
     class TestRenderer(BaseRenderer):
+
         def generate_report(self, data, output_file):
+            pass
+
+        async def generate_report_async(self, data, output_file):
             pass
 
     account = account_factory()
