@@ -1,14 +1,11 @@
-#  Copyright © 2021 CloudBlue. All rights reserved.
+#  Copyright © 2022 CloudBlue. All rights reserved.
+
 import pathlib
 import os
-from datetime import datetime
 from functools import partial
-
-import pytz
 
 from weasyprint import CSS, HTML, default_url_fetcher
 
-from connect.reports.renderers.base import temp_dir
 from connect.reports.renderers.j2 import Jinja2Renderer
 from connect.reports.renderers.registry import register
 
@@ -38,14 +35,6 @@ class PDFRenderer(Jinja2Renderer):
     the generation report function, exporting the data
     to a PDF file.
     """
-    def render(self, data, output_file, start_time=None):
-        start_time = start_time or datetime.now(tz=pytz.utc)
-        with temp_dir() as tmpdir:
-            self.cwd = tmpdir
-            report_file = self.generate_report(data, f'{tmpdir}/report')
-            summary_file = self.generate_summary(f'{tmpdir}/summary', start_time)
-            pack_file = self.pack_files(report_file, summary_file, output_file)
-        return pack_file
 
     def generate_report(self, data, output_file):
         tokens = output_file.split('.')
@@ -57,7 +46,7 @@ class PDFRenderer(Jinja2Renderer):
             local_fetcher,
             root_dir=self.root_dir,
             template_dir=os.path.dirname(self.template),
-            cwd=getattr(self, 'cwd', os.getcwd()),
+            cwd=self.current_working_directory,
         )
         kwargs = {}
         css_file = self.args.get('css_file')
@@ -66,6 +55,30 @@ class PDFRenderer(Jinja2Renderer):
             kwargs['stylesheets'] = [css]
         html = HTML(filename=rendered_file, url_fetcher=fetcher)
         html.write_pdf(output_file, **kwargs)
+        return output_file
+
+    async def generate_report_async(self, data, output_file):
+        tokens = output_file.split('.')
+        if tokens[-1] != 'pdf':
+            output_file = f'{tokens[0]}.pdf'
+
+        rendered_file = await super().generate_report_async(data, output_file)
+        fetcher = partial(
+            local_fetcher,
+            root_dir=self.root_dir,
+            template_dir=os.path.dirname(self.template),
+            cwd=self.current_working_directory,
+        )
+
+        def _generate():
+            kwargs = {}
+            css_file = self.args.get('css_file')
+            if css_file:
+                css = CSS(filename=os.path.join(self.root_dir, css_file), url_fetcher=fetcher)
+                kwargs['stylesheets'] = [css]
+            html = HTML(filename=rendered_file, url_fetcher=fetcher)
+            html.write_pdf(output_file, **kwargs)
+        await self._to_thread(_generate)
         return output_file
 
     @classmethod

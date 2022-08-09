@@ -1,4 +1,4 @@
-#  Copyright © 2021 CloudBlue. All rights reserved.
+#  Copyright © 2022 CloudBlue. All rights reserved.
 
 import pytest
 
@@ -162,6 +162,15 @@ def report_data():
             [f'row_{i}_col_{j}' for j in range(cols)]
             for i in range(rows)
         ]
+    return _data
+
+
+@pytest.fixture
+def report_data_gen():
+    def _data(rows=10, cols=10):
+        for j in range(cols):
+            for i in range(rows):
+                yield f'row_{i}_col_{j}'
     return _data
 
 

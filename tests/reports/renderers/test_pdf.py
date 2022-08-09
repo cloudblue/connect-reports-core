@@ -1,5 +1,4 @@
-#  Copyright © 2021 CloudBlue. All rights reserved.
-import os
+#  Copyright © 2022 CloudBlue. All rights reserved.
 
 import pytest
 
@@ -96,7 +95,7 @@ def test_generate_report(mocker, account_factory, report_factory, report_data):
     assert renderer.generate_report(data, 'report.pdf') == 'report.pdf'
 
     mocked_partial.assert_called_once_with(
-        local_fetcher, root_dir='root_dir', template_dir='report_dir', cwd=os.getcwd(),
+        local_fetcher, root_dir='root_dir', template_dir='report_dir', cwd=None,
     )
     assert mocked_html.mock_calls[0].kwargs['filename'] == 'report.pdf.html'
     assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
@@ -127,7 +126,7 @@ def test_generate_report_external_css(mocker, account_factory, report_factory, r
     assert renderer.generate_report(data, 'report.pdf') == 'report.pdf'
 
     mocked_partial.assert_called_once_with(
-        local_fetcher, root_dir='root_dir', template_dir='report_dir', cwd=os.getcwd(),
+        local_fetcher, root_dir='root_dir', template_dir='report_dir', cwd=None,
     )
     assert mocked_html.mock_calls[0].kwargs['filename'] == 'report.pdf.html'
     assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
@@ -199,6 +198,44 @@ def test_render_tmpfs_ok(report_data, account_factory, report_factory):
     data = report_data(2, 2)
     path_to_output = f'{tmp_fs.root_path}/package/report/report'
     output_file = renderer.render(data, path_to_output)
+
+    assert output_file == f'{path_to_output}.zip'
+    with ZipFile(output_file) as zip_file:
+        assert sorted(zip_file.namelist()) == ['report.pdf', 'summary.json']
+        with zip_file.open('report.pdf', 'r') as fp:
+            assert 'PDF Report' in str(fp.read())
+
+
+@pytest.mark.asyncio
+async def test_render_async_tmpfs_ok(report_data, account_factory, report_factory):
+    tmp_fs = TempFS()
+    tmp_fs.makedirs('package/report')
+    with tmp_fs.open('package/report/template.html.j2', 'w') as fp:
+        fp.write('''
+            <html>
+                <head><title>PDF Report</title></head>
+                <body>
+                    <ul>
+                        {% for item in data %}
+                        <li>{{item[0]}} {{item[1]}}</li>
+                        {% endfor %}
+                    </ul>
+                </body>
+            </html>
+        ''')
+    with tmp_fs.open('package/report/template.css', 'w') as fp:
+        fp.write('')
+    renderer = PDFRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+        template='package/report/template.html.j2',
+        args={'css_file': 'package/report/template.css'},
+    )
+    data = report_data(2, 2)
+    path_to_output = f'{tmp_fs.root_path}/package/report/report'
+    output_file = await renderer.render_async(data, path_to_output)
 
     assert output_file == f'{path_to_output}.zip'
     with ZipFile(output_file) as zip_file:
