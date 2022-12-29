@@ -1,6 +1,7 @@
 #  Copyright © 2022 CloudBlue. All rights reserved.
 
 import pytest
+from fs.tempfs import TempFS
 
 from connect.reports.datamodels import (
     ChoicesParameterDefinition,
@@ -15,8 +16,6 @@ from connect.reports.validator import (
     _validate_report,
     validate,
 )
-
-from fs.tempfs import TempFS
 
 
 def test_validator_parameters_unknown_type(param_json):

@@ -1,5 +1,6 @@
 #  Copyright © 2022 CloudBlue. All rights reserved.
 
+from connect.reports.constants import DEFAULT_RENDERER_ID
 from connect.reports.datamodels import (
     ChoicesParameterDefinition,
     ParameterDefinition,
@@ -7,7 +8,6 @@ from connect.reports.datamodels import (
     ReportDefinition,
     RepositoryDefinition,
 )
-from connect.reports.constants import DEFAULT_RENDERER_ID
 
 
 def parse(root_path, data):

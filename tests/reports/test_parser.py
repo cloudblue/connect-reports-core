@@ -1,12 +1,12 @@
 #  Copyright © 2022 CloudBlue. All rights reserved.
 
-from connect.reports.parser import parse
 from connect.reports.datamodels import (
     ParameterDefinition,
     RendererDefinition,
     ReportDefinition,
     RepositoryDefinition,
 )
+from connect.reports.parser import parse
 
 
 def test_parse_default(repo_json):

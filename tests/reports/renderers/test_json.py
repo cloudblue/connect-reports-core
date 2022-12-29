@@ -4,9 +4,7 @@ from datetime import date, datetime, time
 from zipfile import ZipFile
 
 import orjson
-
 import pytest
-
 from fs.tempfs import TempFS
 
 from connect.reports.datamodels import RendererDefinition

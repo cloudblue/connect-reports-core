@@ -1,13 +1,11 @@
 #  Copyright © 2022 CloudBlue. All rights reserved.
-
-import pytest
-
-from fs.tempfs import TempFS
-
 from zipfile import ZipFile
 
-from connect.reports.renderers.base import BaseRenderer, temp_dir
+import pytest
+from fs.tempfs import TempFS
+
 from connect.reports.datamodels import RendererDefinition
+from connect.reports.renderers.base import BaseRenderer, temp_dir
 
 
 def test_generate_report():

@@ -1,13 +1,11 @@
 #  Copyright © 2022 CloudBlue. All rights reserved.
+from zipfile import ZipFile
+
+import pytest
+from fs.tempfs import TempFS
 
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers.csv import CSVRenderer
-
-import pytest
-
-from fs.tempfs import TempFS
-
-from zipfile import ZipFile
 
 
 def test_validate_ok():
