@@ -3,10 +3,8 @@
 from datetime import datetime
 
 import pytest
-
 from fs.tempfs import TempFS
-
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook, Workbook
 
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import XLSXRenderer

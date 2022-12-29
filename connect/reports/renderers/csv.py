@@ -1,12 +1,11 @@
 #  Copyright © 2022 CloudBlue. All rights reserved.
 
+import csv
 import inspect
 
 from connect.reports.renderers.base import BaseRenderer
 from connect.reports.renderers.registry import register
 from connect.reports.renderers.utils import aiter
-
-import csv
 
 
 @register('csv')

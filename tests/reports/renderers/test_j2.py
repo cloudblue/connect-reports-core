@@ -1,15 +1,13 @@
 #  Copyright © 2022 CloudBlue. All rights reserved.
+import csv
+from io import TextIOWrapper
+from zipfile import ZipFile
+
+import pytest
+from fs.tempfs import TempFS
 
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import Jinja2Renderer
-
-import pytest
-
-from zipfile import ZipFile
-import csv
-from io import TextIOWrapper
-
-from fs.tempfs import TempFS
 
 
 def test_validate_ok(mocker):

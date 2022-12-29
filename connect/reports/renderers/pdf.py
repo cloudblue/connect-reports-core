@@ -1,10 +1,10 @@
 #  Copyright © 2022 CloudBlue. All rights reserved.
 
-import pathlib
 import os
+import pathlib
 from functools import partial
 
-from weasyprint import CSS, HTML, default_url_fetcher
+from weasyprint import CSS, default_url_fetcher, HTML
 
 from connect.reports.renderers.j2 import Jinja2Renderer
 from connect.reports.renderers.registry import register

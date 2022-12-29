@@ -3,7 +3,6 @@
 import os
 
 import pytest
-
 from fs.tempfs import TempFS
 
 from connect.reports.datamodels import (
