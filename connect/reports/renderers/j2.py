@@ -2,11 +2,7 @@
 
 import os
 
-from jinja2 import (
-    Environment,
-    FileSystemLoader,
-    select_autoescape,
-)
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from connect.reports.renderers.base import BaseRenderer
 from connect.reports.renderers.registry import register
