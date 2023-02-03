@@ -2,6 +2,7 @@
 
 from connect.reports.renderers.base import BaseRenderer
 
+
 _RENDERERS = {}
 
 

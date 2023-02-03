@@ -9,7 +9,7 @@ from zipfile import BadZipfile
 import pytz
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.styles.colors import Color, WHITE
+from openpyxl.styles.colors import WHITE, Color
 from openpyxl.utils.exceptions import InvalidFileException
 
 from connect.reports.renderers.base import BaseRenderer
