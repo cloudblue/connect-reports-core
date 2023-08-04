@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connect-reports-core"
-version = "24.1.0"
+version = "0.0.0"
 description = "Connect Reports Core"
 authors = ["CloudBlue LLC"]
 license = "Apache-2.0"
@@ -28,7 +28,7 @@ python = ">=3.8,<4"
 openpyxl = ">=2.5.14"
 WeasyPrint = "^53.4"
 Jinja2 = ">=2,<4"
-jsonschema = "^3.2.0"
+jsonschema = ">=3,<5"
 pytz = ">=2022"
 lxml = ">=4.9"
 orjson = "^3.5.2"
@@ -36,7 +36,7 @@ plotly = "5.9.0"
 kaleido = "0.2.1"
 
 [tool.poetry.group.test.dependencies]
-ipython = "^7.21.0"
+ipython = "^8"
 pytest = ">=6.1.2,<8"
 pytest-cov = ">=2.10.1,<5"
 pytest-mock = "^3.3.1"
