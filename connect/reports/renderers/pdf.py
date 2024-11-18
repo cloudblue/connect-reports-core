@@ -48,13 +48,13 @@ class PDFRenderer(Jinja2Renderer):
             template_dir=os.path.dirname(self.template),
             cwd=self.current_working_directory,
         )
-        kwargs = {}
+        options = {'uncompressed_pdf': True}
         css_file = self.args.get('css_file')
         if css_file:
             css = CSS(filename=os.path.join(self.root_dir, css_file), url_fetcher=fetcher)
-            kwargs['stylesheets'] = [css]
+            options.update({'stylesheets': [css]})
         html = HTML(filename=rendered_file, url_fetcher=fetcher)
-        html.write_pdf(output_file, **kwargs)
+        html.write_pdf(output_file, **options)
         return output_file
 
     async def generate_report_async(self, data, output_file):
@@ -71,13 +71,13 @@ class PDFRenderer(Jinja2Renderer):
         )
 
         def _generate():
-            kwargs = {}
+            options = {'uncompressed_pdf': True}
             css_file = self.args.get('css_file')
             if css_file:
                 css = CSS(filename=os.path.join(self.root_dir, css_file), url_fetcher=fetcher)
-                kwargs['stylesheets'] = [css]
+                options.update({'stylesheets': [css]})
             html = HTML(filename=rendered_file, url_fetcher=fetcher)
-            html.write_pdf(output_file, **kwargs)
+            html.write_pdf(output_file, **options)
         await self._to_thread(_generate)
         return output_file
 

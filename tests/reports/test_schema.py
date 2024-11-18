@@ -69,7 +69,7 @@ def test_repo_object_reports_minitem(repo_json):
     errors = validate_with_schema(repo)
 
     assert errors is not None
-    assert '[] is too short' == errors.splitlines()[0]
+    assert '[] should be non-empty' == errors.splitlines()[0]
 
 
 @pytest.mark.parametrize(
@@ -151,7 +151,7 @@ def test_reportv1_object_array_minitems_audience(repo_json, report_v1_json):
     errors = validate_with_schema(repo)
 
     assert errors is not None
-    assert '[] is too short' == errors.splitlines()[0]
+    assert '[] should be non-empty' == errors.splitlines()[0]
 
 
 def test_reportv1_object_audience_string_items(repo_json, report_v1_json):
@@ -229,7 +229,7 @@ def test_reportv2_object_array_minitems(repo_json, report_v2_json, field):
     errors = validate_with_schema(repo)
 
     assert errors is not None
-    assert '[] is too short' == errors.splitlines()[0]
+    assert '[] should be non-empty' == errors.splitlines()[0]
 
 
 def test_reportv2_object_audience_string_items(repo_json, report_v2_json):
@@ -334,7 +334,7 @@ def test_parameter_object_minitem_choices_field(repo_json, report_v2_json):
     errors = validate_with_schema(repo)
 
     assert errors is not None
-    assert "[] is too short" == errors.splitlines()[0]
+    assert '[] should be non-empty' == errors.splitlines()[0]
 
 
 @pytest.mark.parametrize(
