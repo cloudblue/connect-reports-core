@@ -15,42 +15,42 @@ classifiers = [
     "Environment :: Console",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Utilities",
     "Topic :: Software Development :: Libraries",
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4"
+python = ">=3.9,<4"
 openpyxl = ">=2.5.14"
-WeasyPrint = "^53.4"
+WeasyPrint = ">=59,<64"
 Jinja2 = ">=2,<4"
 jsonschema = ">=3,<5"
-pytz = ">=2022"
+pytz = "*"
 lxml = ">=4.9"
-orjson = "^3.5.2"
-plotly = "5.9.0"
-kaleido = "0.2.1"
+orjson = ">=3.5.2,<4"
+plotly = ">=5.9.0,<6"
+kaleido = ">=0.4,<1"
 
 [tool.poetry.group.test.dependencies]
 ipython = "^8"
-pytest = ">=6.1.2,<8"
-pytest-cov = ">=2.10.1,<5"
-pytest-mock = "^3.3.1"
+pytest = ">=6.1.2,<9"
+pytest-cov = ">=2.10.1,<7"
+pytest-mock = "^3.14"
 coverage = {extras = ["toml"], version = ">=5.3,<7"}
-flake8 = ">=3.8,<6"
-flake8-bugbear = ">=20,<23"
+flake8 = ">=3.8,<8"
+flake8-bugbear = ">=20,<25"
 flake8-cognitive-complexity = "^0.1"
-flake8-commas = "~2.1"
+flake8-commas = "^4.0"
 flake8-future-import = "~0.4"
-flake8-broken-line = ">=0.3,<0.7"
-flake8-pyproject = "^1.2.2"
-fs = "^2.4.12"
-pytest-asyncio = "^0.20.1"
-flake8-isort = "^6.0.0"
+flake8-broken-line = "^1.0"
+flake8-pyproject = "^1.2.3"
+fs = "^2.4.16"
+pytest-asyncio = "^0.24"
+flake8-isort = "^6.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools"]

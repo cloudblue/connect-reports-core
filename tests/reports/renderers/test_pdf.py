@@ -98,7 +98,7 @@ def test_generate_report(mocker, account_factory, report_factory, report_data):
     assert mocked_html.mock_calls[0].kwargs['filename'] == 'report.pdf.html'
     assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
 
-    html.write_pdf.assert_called_once_with('report.pdf')
+    html.write_pdf.assert_called_once_with('report.pdf', uncompressed_pdf=True)
 
 
 def test_generate_report_external_css(mocker, account_factory, report_factory, report_data):
@@ -132,7 +132,7 @@ def test_generate_report_external_css(mocker, account_factory, report_factory, r
     assert mocked_css.mock_calls[0].kwargs['filename'] == 'root_dir/report_dir/template.css'
     assert mocked_css.mock_calls[0].kwargs['url_fetcher'] == fetcher
 
-    html.write_pdf.assert_called_once_with('report.pdf', stylesheets=[css])
+    html.write_pdf.assert_called_once_with('report.pdf', uncompressed_pdf=True, stylesheets=[css])
 
 
 def test_validate_tmpfs_template_wrong_name():
