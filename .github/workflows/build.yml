@@ -33,6 +33,12 @@ jobs:
     - name: Testing
       run: |
         poetry run pytest
+    - name: Install from declared constraints
+      run: |
+        python -m venv /tmp/fresh
+        /tmp/fresh/bin/pip install .
+        /tmp/fresh/bin/pip check
+        /tmp/fresh/bin/python -c "import connect.reports"
   sonar:
     needs: [test]
     runs-on: ubuntu-latest

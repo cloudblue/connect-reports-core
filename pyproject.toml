@@ -32,7 +32,7 @@ pytz = "*"
 lxml = ">=4.9"
 orjson = ">=3.5.2,<4"
 plotly = ">=5.9.0,<6"
-kaleido = ">=0.4,<1"
+kaleido = "0.2.1"
 
 [tool.poetry.group.test.dependencies]
 ipython = "^8"
