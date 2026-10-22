@@ -10,10 +10,10 @@ This library is reponsible for validation of reports definition, choosing of ren
 
 ## Install
 
-`Connect Reports Core` requires python 3.9 or later and has the following dependencies:
+`Connect Reports Core` requires python 3.10 or later and has the following dependencies:
 
 * openpyxl >=2.5.14
-* WeasyPrint >=59,<64
+* WeasyPrint >=70,<71
 * Jinja2 >=2,<4
 * jsonschema >=3,<5
 * pytz *
