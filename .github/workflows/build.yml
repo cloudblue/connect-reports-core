@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v3
       with:
@@ -33,6 +33,12 @@ jobs:
     - name: Testing
       run: |
         poetry run pytest
+    - name: Install from declared constraints
+      run: |
+        python -m venv /tmp/fresh
+        /tmp/fresh/bin/pip install .
+        /tmp/fresh/bin/pip check
+        /tmp/fresh/bin/python -c "import connect.reports"
   sonar:
     needs: [test]
     runs-on: ubuntu-latest

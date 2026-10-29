@@ -3,10 +3,11 @@ from zipfile import ZipFile
 
 import pytest
 from fs.tempfs import TempFS
+from PIL import Image
 
 from connect.reports.datamodels import RendererDefinition
 from connect.reports.renderers import PDFRenderer
-from connect.reports.renderers.pdf import local_fetcher
+from connect.reports.renderers.pdf import LocalURLFetcher
 
 
 @pytest.mark.parametrize('args', (None, {}, {'css_file': 'my/css_file.css'}))
@@ -55,22 +56,26 @@ def test_validate_css_not_found(mocker):
         ),
     ),
 )
-def test_local_fetcher(mocker, url, expected_url):
-    def_fetcher = mocker.patch('connect.reports.renderers.pdf.default_url_fetcher')
+def test_local_url_fetcher(mocker, url, expected_url):
+    def_fetch = mocker.patch('weasyprint.urls.URLFetcher.fetch')
 
-    local_fetcher(url, root_dir='/root_dir', template_dir='template_dir', cwd='/tmp/my_temp_dir')
+    LocalURLFetcher(
+        root_dir='/root_dir', template_dir='template_dir', cwd='/tmp/my_temp_dir',
+    ).fetch(url)
 
-    def_fetcher.assert_called_once_with(expected_url)
+    def_fetch.assert_called_once_with(expected_url, None)
 
 
-def test_local_fetcher_root_with_spaces(mocker):
+def test_local_url_fetcher_root_with_spaces(mocker):
     url = 'file:///root%20dir/template_dir/template_dir/image.png'
     expected_url = 'file:///root%20dir/template_dir/image.png'
-    def_fetcher = mocker.patch('connect.reports.renderers.pdf.default_url_fetcher')
+    def_fetch = mocker.patch('weasyprint.urls.URLFetcher.fetch')
 
-    local_fetcher(url, root_dir='/root dir', template_dir='template_dir', cwd='/tmp/my_temp_dir')
+    LocalURLFetcher(
+        root_dir='/root dir', template_dir='template_dir', cwd='/tmp/my_temp_dir',
+    ).fetch(url)
 
-    def_fetcher.assert_called_once_with(expected_url)
+    def_fetch.assert_called_once_with(expected_url, None)
 
 
 def test_generate_report(mocker, account_factory, report_factory, report_data):
@@ -81,7 +86,9 @@ def test_generate_report(mocker, account_factory, report_factory, report_data):
     html = mocker.MagicMock()
     mocked_html = mocker.patch('connect.reports.renderers.pdf.HTML', return_value=html)
     fetcher = mocker.MagicMock()
-    mocked_partial = mocker.patch('connect.reports.renderers.pdf.partial', return_value=fetcher)
+    mocked_fetcher = mocker.patch(
+        'connect.reports.renderers.pdf.LocalURLFetcher', return_value=fetcher,
+    )
 
     renderer = PDFRenderer(
         'runtime environment', 'root_dir',
@@ -92,8 +99,8 @@ def test_generate_report(mocker, account_factory, report_factory, report_data):
     data = report_data()
     assert renderer.generate_report(data, 'report.pdf') == 'report.pdf'
 
-    mocked_partial.assert_called_once_with(
-        local_fetcher, root_dir='root_dir', template_dir='report_dir', cwd=None,
+    mocked_fetcher.assert_called_once_with(
+        root_dir='root_dir', template_dir='report_dir', cwd=None,
     )
     assert mocked_html.mock_calls[0].kwargs['filename'] == 'report.pdf.html'
     assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
@@ -111,7 +118,9 @@ def test_generate_report_external_css(mocker, account_factory, report_factory, r
     css = mocker.MagicMock()
     mocked_css = mocker.patch('connect.reports.renderers.pdf.CSS', return_value=css)
     fetcher = mocker.MagicMock()
-    mocked_partial = mocker.patch('connect.reports.renderers.pdf.partial', return_value=fetcher)
+    mocked_fetcher = mocker.patch(
+        'connect.reports.renderers.pdf.LocalURLFetcher', return_value=fetcher,
+    )
 
     renderer = PDFRenderer(
         'runtime environment', 'root_dir',
@@ -123,8 +132,8 @@ def test_generate_report_external_css(mocker, account_factory, report_factory, r
     data = report_data()
     assert renderer.generate_report(data, 'report.pdf') == 'report.pdf'
 
-    mocked_partial.assert_called_once_with(
-        local_fetcher, root_dir='root_dir', template_dir='report_dir', cwd=None,
+    mocked_fetcher.assert_called_once_with(
+        root_dir='root_dir', template_dir='report_dir', cwd=None,
     )
     assert mocked_html.mock_calls[0].kwargs['filename'] == 'report.pdf.html'
     assert mocked_html.mock_calls[0].kwargs['url_fetcher'] == fetcher
@@ -240,3 +249,39 @@ async def test_render_async_tmpfs_ok(report_data, account_factory, report_factor
         assert sorted(zip_file.namelist()) == ['report.pdf', 'summary.json']
         with zip_file.open('report.pdf', 'r') as fp:
             assert 'PDF Report' in str(fp.read())
+
+
+def test_render_tmpfs_local_and_missing_resources(report_data, account_factory, report_factory):
+    tmp_fs = TempFS()
+    tmp_fs.makedirs('package/report')
+    with tmp_fs.open('package/report/template.html.j2', 'w') as fp:
+        fp.write('''
+            <html>
+                <head>
+                    <title>PDF Report</title>
+                    <link rel="stylesheet" href="missing.css">
+                </head>
+                <body>
+                    <img src="logo.png">
+                    <img src="missing.png">
+                    <p>{{ data[0][0] }}</p>
+                </body>
+            </html>
+        ''')
+    with tmp_fs.open('logo.png', 'wb') as fp:
+        Image.new('RGB', (8, 8), (200, 30, 30)).save(fp, format='PNG')
+    renderer = PDFRenderer(
+        'runtime',
+        tmp_fs.root_path,
+        account_factory(),
+        report_factory(),
+        template='package/report/template.html.j2',
+    )
+    path_to_output = f'{tmp_fs.root_path}/package/report/report'
+    output_file = renderer.render(report_data(1, 1), path_to_output)
+
+    with ZipFile(output_file) as zip_file:
+        with zip_file.open('report.pdf', 'r') as fp:
+            content = fp.read()
+    assert b'PDF Report' in content
+    assert b'/Subtype /Image' in content
