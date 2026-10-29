@@ -38,7 +38,7 @@ jobs:
         python -m venv /tmp/fresh
         /tmp/fresh/bin/pip install .
         /tmp/fresh/bin/pip check
-        /tmp/fresh/bin/python -c "import connect.reports"
+        /tmp/fresh/bin/python -c "import connect.reports.renderers"
   sonar:
     needs: [test]
     runs-on: ubuntu-latest
