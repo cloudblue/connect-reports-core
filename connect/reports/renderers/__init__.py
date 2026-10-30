@@ -1,4 +1,4 @@
-#  Copyright © 2022 CloudBlue. All rights reserved.
+#  Copyright © 2025 CloudBlue. All rights reserved.
 
 from connect.reports.renderers.csv import CSVRenderer  # noqa
 from connect.reports.renderers.j2 import Jinja2Renderer  # noqa
