@@ -1,4 +1,4 @@
-#  Copyright © 2022 CloudBlue. All rights reserved.
+#  Copyright © 2025 CloudBlue. All rights reserved.
 
 from connect.reports.constants import DEFAULT_RENDERER_ID
 from connect.reports.datamodels import (
