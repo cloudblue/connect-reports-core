@@ -2,29 +2,42 @@
 
 import os
 import pathlib
-from functools import partial
 
-from weasyprint import CSS, HTML, default_url_fetcher
+from weasyprint import CSS, HTML
+from weasyprint.urls import URLFetcher
 
 from connect.reports.renderers.j2 import Jinja2Renderer
 from connect.reports.renderers.registry import register
 
 
-def local_fetcher(url, root_dir=None, template_dir=None, cwd=None):
-    tpl_dir_path = pathlib.Path(os.path.abspath(root_dir)) / pathlib.Path(template_dir)
-    tpl_dir_url = tpl_dir_path.as_uri()
-    if url.startswith(f'file://{cwd}'):
-        rel_path = os.path.relpath(url[7:], cwd)
-        new_path = os.path.join(
-            os.path.abspath(root_dir),
-            rel_path,
-        )
-        url = f'file://{new_path}'
-    elif url.startswith(tpl_dir_url):
-        count = url.count(template_dir)
-        if url.count(template_dir) > 1:
-            url = url.replace(f'{template_dir}/', '', count - 1)
-    return default_url_fetcher(url)
+class LocalURLFetcher(URLFetcher):
+    """
+    URL fetcher that maps the file URLs generated while rendering
+    (relative to the temporary working directory) to the report root directory.
+    """
+
+    def __init__(self, root_dir=None, template_dir=None, cwd=None, **kwargs):
+        super().__init__(**kwargs)
+        self.root_dir = root_dir
+        self.template_dir = template_dir
+        self.cwd = cwd
+
+    def fetch(self, url, headers=None):
+        root_dir, template_dir, cwd = self.root_dir, self.template_dir, self.cwd
+        tpl_dir_path = pathlib.Path(os.path.abspath(root_dir)) / pathlib.Path(template_dir)
+        tpl_dir_url = tpl_dir_path.as_uri()
+        if url.startswith(f'file://{cwd}'):
+            rel_path = os.path.relpath(url[7:], cwd)
+            new_path = os.path.join(
+                os.path.abspath(root_dir),
+                rel_path,
+            )
+            url = f'file://{new_path}'
+        elif url.startswith(tpl_dir_url):
+            count = url.count(template_dir)
+            if url.count(template_dir) > 1:
+                url = url.replace(f'{template_dir}/', '', count - 1)
+        return super().fetch(url, headers)
 
 
 @register('pdf')
@@ -42,8 +55,7 @@ class PDFRenderer(Jinja2Renderer):
             output_file = f'{tokens[0]}.pdf'
 
         rendered_file = super().generate_report(data, output_file)
-        fetcher = partial(
-            local_fetcher,
+        fetcher = LocalURLFetcher(
             root_dir=self.root_dir,
             template_dir=os.path.dirname(self.template),
             cwd=self.current_working_directory,
@@ -63,8 +75,7 @@ class PDFRenderer(Jinja2Renderer):
             output_file = f'{tokens[0]}.pdf'
 
         rendered_file = await super().generate_report_async(data, output_file)
-        fetcher = partial(
-            local_fetcher,
+        fetcher = LocalURLFetcher(
             root_dir=self.root_dir,
             template_dir=os.path.dirname(self.template),
             cwd=self.current_working_directory,

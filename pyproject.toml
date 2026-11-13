@@ -15,7 +15,6 @@ classifiers = [
     "Environment :: Console",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -24,16 +23,16 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4"
+python = ">=3.10,<4"
 openpyxl = ">=2.5.14"
-WeasyPrint = ">=59,<64"
+WeasyPrint = ">=70,<71"
 Jinja2 = ">=2,<4"
 jsonschema = ">=3,<5"
 pytz = "*"
 lxml = ">=4.9"
 orjson = ">=3.5.2,<4"
 plotly = ">=5.9.0,<6"
-kaleido = ">=0.4,<1"
+kaleido = "0.2.1"
 
 [tool.poetry.group.test.dependencies]
 ipython = "^8"
